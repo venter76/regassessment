@@ -4,8 +4,8 @@ async function createPDF(url) {
   try {
     const browser = await puppeteer.launch({
       headless: false,
-      slowMo: 150, // slow down by 250ms
-      executablePath: process.env.CHROME_BIN || process.env.CHROME_PATH,
+      slowMo: 250, // slow down by 250ms
+      executablePath: process.env.CHROME_PATH,
 
       
       // Use the correct environment variable for your Chrome or Chromium path
