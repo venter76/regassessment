@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://kit.fontawesome.com/8a901d03fb.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+      body {
+        background-color: rgb(239, 234, 216)
+        /* rgb(185, 155, 107) */
+        /* rgb(243, 233, 159); */
+      }
+
+      .header-container {
+
+        border-bottom: 2px solid rgb(13, 6, 36);
+        background-color: gray;
+
+      }
+
+      .container {
+      border: 2px solid rgb(13, 6, 36);
+      border-radius: 15px;
+      background-color: rgb(201, 198, 198);
+     
+      
+      
+  }
+
+    #digital-clock {
+        font-size: 2vw;
+        padding-top: 1vh;
+        color: rgba(245, 245, 245, 0.686);
+    }
+
+    #current-date {
+      font-size: 3vw;
+      padding-top: 1vh ;
+      color: rgba(245, 245, 245, 0.686);
+    }
+  
+ /* Custom styling for the slider container */
+ .slider-container {
+  
+    display: flex;
+    align-items: center;
+  }
+
+  /* Custom styling for the slider */
+  .slider {
+  
+    width: 100% !important;
+    
+  }
+
+  /* Custom styling for the number display */
+  .slider-value {
+    color: rgb(251, 148, 111);
+    min-width: 40px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+   
+  /* Custom styling for the slider track */
+  .slider-track {
+
+    width: 100%;
+    height: 1px;
+    border-radius: 3px;
+    background-color: #313437; /* Original blue color */
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  
+
+
+  .card {
+    background-color: #c8c9ca; 
+}
+
+.form-control {
+    background-color: rgb(197, 194, 194); /* Use the desired color */
+}
+
+#title {
+    color: whitesmoke;
+    text-align: center;
+}
+
+#divider {
+    border-top: 3px solid rgba(251, 148, 111, 0.844);;
+    width: 100%;
+}
+
+input[type="range"] {
+  accent-color: rgb(251, 148, 111);
+}
+
+        /* Center the text for h1, h2, and h3 inside the body */
+        body h1, body h2, body h3 {
+            text-align: center;
+        }
+
+        /* Style for h3 (Report for:) */
+        h3 {
+            color: black;
+        }
+
+        /* Style for h2 (regName) */
+        h2 {
+            color: blue;
+        }
+
+        /* Remove the default margins to make them appear on the same line */
+        h1, h2, h3 {
+            margin: 0;
+        }
+  
+ 
+
+
+</style>
+
+  
+</head>
+
+
+<header>
+    <div class="header-container">
+     
+  
+        <div class="row">
+          <div class="col-2 col-md-2">
+            <i class='fas fa-syringe' style='font-size:35px;color: rgba(251, 148, 111, 0.625); padding: 4vh 2vw 3vh;'></i>
+            </div>
+            <div class="col-7 col-md-6">
+             
+                <h6 class="display-2" style="color: whitesmoke;">DACC</h6>
+                <h6>
+                    <small class="text-body-secondary" style="color: whitesmoke; padding-left: 1vw;">Continuous asessment tool</small>
+                </h6>
+                </div>
+                <div class="col-3 col-md-4">
+                  <div id="current-date"></div>
+                <div id="digital-clock"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+</header>
+
+
+
+
+  <body>
+    <br>
+    <h1>
+      <h3>Report for:</h3>
+      <h2><%= regName %></h2>
+  </h1>
+   
+    <div class="container mt-4">
+        <!-- <div class="row justify-content-center"> -->
+            <div class="col-12">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+        </div>
+        
+        <br>
+        <div class="container mt-4">
+<!-- Positive Comments Card -->
+<div class="card mb-4 mt-4">
+  <div class="card-header">
+    Positive Comments
+  </div>
+  <div class="card-body">
+    <ul>
+    <% positiveComments.forEach(function(comment) { %>
+      <li><%= comment %></li>
+    <% }); %>
+    </ul>
+  </div>
+</div>
+
+<!-- Negative Comments Card -->
+<div class="card mb-4">
+  <div class="card-header">
+    Negative Comments
+  </div>
+  <div class="card-body">
+    <ul>
+    <% negativeComments.forEach(function(comment) { %>
+      <li><%= comment %></li>
+    <% }); %>
+    </ul>
+  </div>
+</div>
+
+<!-- Red Comments Card -->
+<div class="card mb-4">
+  <div class="card-header">
+    Red Comments
+  </div>
+  <div class="card-body">
+    <ul>
+    <% redComments.forEach(function(comment) { %>
+      <li><%= comment %></li>
+    <% }); %>
+    </ul>
+  </div>
+</div>
+
+<!-- Red Comments Card -->
+<div class="card mb-4">
+  <div class="card-header">
+    Scores
+  </div>
+  <div class="card-body">
+    <% for(let key in analyzedData) { %>
+        <p><strong><%= key %>:</strong> 
+            <% 
+                if (analyzedData[key].below !== 0) { 
+                    %> Number of Poor/Below Average:    <%= analyzedData[key].below %><% 
+                } 
+            %>
+            <% 
+                if (analyzedData[key].above !== 0) { 
+                    if (analyzedData[key].below !== 0) { %> , <% }
+                    %> Number of Excellent:     <%= analyzedData[key].above %><% 
+                } 
+            %>
+        </p>
+    <% } %>  
+</div>
+
+
+  <!-- <div class="card-body">
+    <% for(let key in analyzedData) { %>
+      <p><strong><%= key %>:</strong> Below: <%= analyzedData[key].below %>, Above: <%= analyzedData[key].above %></p>
+    <% } %> -->
+    
+  </div>
+</div>
+</div>
+
+
+
+        <br>
+        <div class="container mt-4">
+          <div class="row">
+
+        <!-- First Card -->
+      <div class="col-md-6">
+        <div class="card">
+            <!-- Trigger modal -->
+            <p class="card-text" style="color: whitesmoke; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#downloadModal">
+              <i class="fas fa-download"></i> Download:
+          </p>
+          
+           
+        </div>
+    </div>
+</div>
+
+<!-- Download Modal -->
+<div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadModalLabel">Download Options</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button onclick="generatePdf()" class="btn btn-secondary btn-sm custom-width-btn">PDF</button>
+                <a href="#" id="excelDownloadLink" class="btn btn-secondary btn-sm custom-width-btn">Excel</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+        <!-- Second Card -->
+<div class="col-md-6">
+  <div class="card">
+      <!-- Trigger modal -->
+      <p class="card-text" style="color: whitesmoke; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#linkModal">
+          <i class="fas fa-link"></i> Link:
+      </p>
+  </div>
+</div>
+<!-- Link Modal -->
+<div class="modal fade" id="linkModal" tabindex="-1" aria-labelledby="linkModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="linkModalLabel">Navigation Options</h5>
+              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <button onclick="window.location.href='/report'" class="btn btn-secondary btn-sm custom-width-btn">New Report</button>
+              <button onclick="window.location.href='/home'" class="btn btn-secondary btn-sm custom-width-btn">Home</button>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+        <!-- <button onclick="generatePdf()" class="btn btn-secondary">Generate PDF</button>
+        <a href="#" id="excelDownloadLink" class="btn btn-secondary">Download Excel</a> -->
+
+               
+
+
+               
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generatePdf() {
+          const url = encodeURIComponent(window.location.href);
+          window.location.href = `/pdf?url=${url}`;
+        }
+      </script>
+<script>
+          document.addEventListener("DOMContentLoaded", function() {
+            const regName = '<%= regName %>';  // Assuming regName is passed to your EJS template
+            const excelDownloadLink = document.getElementById('excelDownloadLink');
+            excelDownloadLink.href = `/download2?regName=${encodeURIComponent(regName)}`;
+          });
+</script>
+
+
+<script>
+  const scoresData = JSON.parse('<%- JSON.stringify(scoresData) %>');  // convert scoresData to JSON
+  console.log("Frontend scoresData:", scoresData);
+  // stringify(scoresData) %>; 
+
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  // Extract all dates and scores
+
+  const dates = scoresData.map(score => new Date(score.date));
+const acaScoretotalValues = scoresData.map(score => score.acaScoretotal);
+const technicalScoretotalValues = scoresData.map(score => score.technicalScoretotal);
+const technicalPScoretotalValues = scoresData.map(score => score.technicalPScoretotal);
+const nonScoretotalValues = scoresData.map(score => score.nonScoretotal);
+
+
+  // const dates = scoresData.map(score => new Date(score.date));
+  // const acaScoretotalValues = scoresData.map(score => score && score.acaScores ? score.acaScores.acaScoretotal : null).filter(score => score !== null);
+
+  
+  // const technicalScoretotalValues = scoresData.map(score => score && score.technicalScores ? score.technicalScores.technicalScoretotal: null).filter(score => score !== null);
+  // const nonScoretotalValues = scoresData.map(score => score && score.nonScores ? score.nonScores.nonScoretotal : null).filter(score => score !== null);
+
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: dates,
+        datasets: [{
+                label: 'Academic Score',
+                data: acaScoretotalValues,
+                borderColor: 'red',
+                backgroundColor: 'rgba(255,0,0,0.1)' // Light red for Academic Score
+            },
+            {
+                label: 'Adult Technical Score',
+                data: technicalScoretotalValues,
+                borderColor: 'blue',
+                fill: false
+            },
+            {
+                label: 'Paediatric Technical Score',
+                data: technicalPScoretotalValues,
+                borderColor: 'yellow',
+                fill: false
+            },
+            {
+                label: 'Non-technical Score',
+                data: nonScoretotalValues,
+                borderColor: 'green',
+                fill: false
+            }
+            // ... repeat for other scores
+        ]
+    },
+    options: {
+        scales: {
+            x: {
+                type: 'time',
+                time: {
+                    unit: 'day',
+                    displayFormats: {
+                        day: 'MMM d, yyyy'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Date'
+                }
+            },
+            y: {
+                min: 0, // This sets the minimum value of y-axis
+                max: 5, // This sets the maximum value of y-axis
+                title: {
+                    display: true,
+                    text: 'Score'
+                }
+            }
+        },
+        animation: {
+            duration: 1000,
+            easing: 'easeOutBounce'
+        }
+    }
+});
+
+console.log('Chart Object:', chart);
+</script>
+      
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script>
+      // Function to format time components
+      function formatTime(i) {
+        if (i < 10) {
+          i = "0" + i;
+        }
+        return i;
+      }
+
+       // Function to add the correct suffix to the day of the month
+  function formatDate(i) {
+    if (i < 4 || i > 20) {
+      switch (i % 10) {
+        case 1:  return i + "st";
+        case 2:  return i + "nd";
+        case 3:  return i + "rd";
+      }
+    }
+    return i + "th";
+  }
+    
+      // Function to update the digital clock and current date
+      function updateClock() {
+        var currentTime = new Date();
+        var hours = formatTime(currentTime.getHours());
+        var minutes = formatTime(currentTime.getMinutes());
+        var seconds = formatTime(currentTime.getSeconds());
+        var timeString = hours + ':' + minutes + ':' + seconds;
+
+        var day = formatDate(currentTime.getDate());
+    var month = currentTime.toLocaleString(undefined, { month: 'long' });
+    var currentDate = month + ' ' + day;
+    
+        // var currentDate = currentTime.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+    
+        document.getElementById('digital-clock').textContent = timeString;
+        document.getElementById('current-date').textContent = currentDate;
+      }
+    
+      // Update the clock every second
+      setInterval(updateClock, 1000);
+    </script>
+    
+
+</body>
+</html>

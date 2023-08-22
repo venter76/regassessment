@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://kit.fontawesome.com/8a901d03fb.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
+    <style>
+      body {
+        background-color: rgb(239, 234, 216)
+        /* rgb(185, 155, 107) */
+        /* rgb(243, 233, 159); */
+      }
+
+      .header-container {
+
+        border-bottom: 2px solid rgb(13, 6, 36);
+        background-color: gray;
+
+      }
+
+      .container {
+      border: 2px solid rgb(13, 6, 36);
+      border-radius: 15px;
+      background-color: grey;
+      
+      
+  }
+
+    #digital-clock {
+        font-size: 2vw;
+        padding-top: 1vh;
+        color: rgba(245, 245, 245, 0.686);
+    }
+
+    #current-date {
+      font-size: 3vw;
+      padding-top: 1vh ;
+      color: rgba(245, 245, 245, 0.686);
+    }
+  
+ /* Custom styling for the slider container */
+ .slider-container {
+  
+    display: flex;
+    align-items: center;
+  }
+
+  /* Custom styling for the slider */
+  .slider {
+  
+    width: 100% !important;
+    
+  }
+
+  /* Custom styling for the number display */
+  .slider-value {
+    color: rgb(251, 148, 111);
+    min-width: 40px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+   
+  /* Custom styling for the slider track */
+  .slider-track {
+
+    width: 100%;
+    height: 1px;
+    border-radius: 3px;
+    background-color: #313437; /* Original blue color */
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  
+
+
+  .card {
+    background-color: #49525e; 
+}
+
+.form-control {
+    background-color: gray; /* Use the desired color */
+}
+
+#title {
+    color: whitesmoke;
+    text-align: center;
+}
+
+#divider {
+    border-top: 3px solid rgba(251, 148, 111, 0.844);;
+    width: 100%;
+}
+
+input[type="range"] {
+  accent-color: rgb(251, 148, 111);
+}
+
+
+  
+
+
+</style>
+
+  
+</head>
+
+
+<header>
+    <div class="header-container">
+        <div class="row">
+          <div class="col-2 col-md-2">
+            <i class='fas fa-syringe' style='font-size:35px;color: rgba(251, 148, 111, 0.625); padding: 4vh 2vw 3vh;'></i>
+            </div>
+            <div class="col-7 col-md-6">
+             
+                <h6 class="display-2" style="color: whitesmoke;">DACC</h6>
+                <h6>
+                    <small class="text-body-secondary" style="color: whitesmoke; padding-left: 1vw;">Continuous asessment tool</small>
+                </h6>
+                </div>
+                <div class="col-3 col-md-4">
+                  <div id="current-date"></div>
+                <div id="digital-clock"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<body>
+  <br>
+
+  <div class="container">
+ 
+    <div class="row">
+    <div class="col-12">
+    <div class="card mb-4 mt-3" >
+    <div class="card-body">
+      <h3 id="title">Generate report</h3>
+    <hr id="divider"/>
+    
+      <br>
+      <p class="card-text">Registrar name</p>
+     
+    
+      
+      <form id="reportForm">  
+        <div class="form-group">
+          <!-- <label for="regName">Choose a name:</label> -->
+          <select class="form-control" id="regName" name="regName" required>
+            <option value="">Select</option>
+            <option value="Fahema Akoonjee">Fahema Akoonjee</option>
+            <option value="Henry Aslett">Henry Aslett</option>
+            <option value="Maxine Atagana">Maxine Atagana</option>
+            <option value="Mevin Bhurtun">Mevin Bhurtun</option>
+            <option value="Luvnish Bisnuthsing">Luvnish Bisnuthsing</option>
+            <option value="Rikus Blomerus">Rikus Blomerus</option>
+            <option value="Lientjie Brown">Lientjie Brown</option>
+            <option value="Nina Carelse">Nina Carelse</option>
+            <option value="Yashraj Deenoo">Yashraj Deenoo</option>
+            <option value="Bulela Dlamini">Bulela Dlamini</option>
+            <option value="Yolanda Dlamini">Yolanda Dlamini</option>
+            <option value="Madelein du Toit">Madelein du Toit</option>
+            <option value="Shenaaz Essa">Shenaaz Essa</option>
+            <option value="Zaakirah Firfirey">Zaakirah Firfirey</option>
+            <option value="Michael Forner">Michael Forner</option>
+            <option value="Fathimath Guraisha">Fathimath Guraisha</option>
+            <option value="Nicole Greeff">Nicole Greeff</option>
+            <option value="Simone Griessel">Simone Griessel</option>
+            <option value="Khin Han">Khin Han</option>
+            <option value="Caitlin Hanck">Caitlin Hanck</option>
+            <option value="Nicole Jacobs">Nicole Jacobs</option>
+            <option value="Chaya Juggoo-Soobhug">Chaya Juggoo-Soobhug</option>
+            <option value="Uhuru Kangueehi">Uhuru Kangueehi</option>
+            <option value="Anika Kenny">Anika Kenny</option>
+            <option value="Femi Khatib">Femi Khatib</option>
+            <option value="Motasim Khlayef">Motasim Khlayef</option>
+            <option value="Olivier Kwete">Olivier Kwete</option>
+            <option value="Thembi Langa">Thembi Langa</option>
+            <option value="Jason Leong">Jason Leong</option>
+            <option value="Katlego Mashiqa">Katlego Mashiqa</option>
+            <option value="Kavish Maharaj">Kavish Maharaj</option>
+            <option value="Zia Maharaj">Zia Maharaj</option>
+            <option value="Zininzi Makalima">Zininzi Makalima</option>
+            <option value="Mbongeni Mathenjwa">Mbongeni Mathenjwa</option>
+            <option value="Monique McIntyre">Monique McIntyre</option>
+            <option value="Faheem Meer">Faheem Meer</option>
+            <option value="Khalid Moosa">Khalid Moosa</option>
+            <option value="Dennis Muchinjiko">Dennis Muchinjiko</option>
+            <option value="David Munnik">David Munnik</option>
+            <option value="Zahnie Nortje">Zahnie Nortje</option>
+            <option value="Pieter Odendaal">Pieter Odendaal</option>
+            <option value="Mahesh Padayachee">Mahesh Padayachee</option>
+            <option value="Viantha Pather">Viantha Pather</option>
+            <option value="Sherwin Prim">Sherwin Prim</option>
+            <option value="Mimi Rabodietso">Mimi Rabodietso</option>
+            <option value="Ashwina Ramkelawon">Ashwina Ramkelawon</option>
+            <option value="AB Ras">AB Ras</option>
+            <option value="Aartee Reebye">Aartee Reebye</option>
+            <option value="Gareth Robinson">Gareth Robinson</option>
+            <option value="Lisa Rossi">Lisa Rossi</option>
+            <option value="Navesh Singh">Navesh Singh</option>
+            <option value="Charl Smit">Charl Smit</option>
+            <option value="Simoné Solomon">Simoné Solomon</option>
+            <option value="Desigen Soondron">Desigen Soondron</option>
+            <option value="Isolde Straub">Isolde Straub</option>
+            <option value="Mphumzi Tati">Mphumzi Tati</option>
+            <option value="Armand Theron">Armand Theron</option>
+            <option value="Charme van Tonder">Charme van Tonder</option>
+            <option value="Rene van Wyk">Rene van Wyk</option>
+            <option value="Ronel vd Westhuizen">Ronel vd Westhuizen</option>
+            <option value="May Venter">May Venter</option>
+            <option value="Bruce Webb">Bruce Webb</option>
+            <option value="Sonja Wronski">Sonja Wronski</option>
+            <option value="Kudzai Zingoni">Kudzai Zingoni</option>
+            <option value="Nico Bester">Nico Bester</option>
+            <option value="Johann Buys">Johann Buys</option>
+            <option value="Prudence Ramolefhe">Prudence Ramolefhe</option>
+            <option value="Theo Masuku">Theo Masuku</option>
+          </select>
+        </div>
+        <br>
+        
+        <div class="row mb-3">
+          <div class="col-sm-12 col-md-6">
+            <br>
+            
+              <button type="submit" class="btn btn-secondary">Submit</button>
+            
+          </div>
+        </div>
+        </form>
+        </div>
+        </div>
+
+        <script>
+          document.getElementById('reportForm').addEventListener('submit', function(e) {
+            // Prevent the form from submitting normally
+            e.preventDefault();
+          
+            // Get the selected regName
+            var regName = document.getElementById('regName').value;
+          
+            // Redirect the user
+            window.location.href = '/reportdig/' + encodeURIComponent(regName);
+          });
+          </script>     
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script>
+      // Function to format time components
+      function formatTime(i) {
+        if (i < 10) {
+          i = "0" + i;
+        }
+        return i;
+      }
+
+       // Function to add the correct suffix to the day of the month
+  function formatDate(i) {
+    if (i < 4 || i > 20) {
+      switch (i % 10) {
+        case 1:  return i + "st";
+        case 2:  return i + "nd";
+        case 3:  return i + "rd";
+      }
+    }
+    return i + "th";
+  }
+    
+      // Function to update the digital clock and current date
+      function updateClock() {
+        var currentTime = new Date();
+        var hours = formatTime(currentTime.getHours());
+        var minutes = formatTime(currentTime.getMinutes());
+        var seconds = formatTime(currentTime.getSeconds());
+        var timeString = hours + ':' + minutes + ':' + seconds;
+
+        var day = formatDate(currentTime.getDate());
+    var month = currentTime.toLocaleString(undefined, { month: 'long' });
+    var currentDate = month + ' ' + day;
+    
+        // var currentDate = currentTime.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+    
+        document.getElementById('digital-clock').textContent = timeString;
+        document.getElementById('current-date').textContent = currentDate;
+      }
+    
+      // Update the clock every second
+      setInterval(updateClock, 1000);
+    </script>
+    
+
+</body>
+</html>
