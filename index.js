@@ -375,6 +375,50 @@ module.exports = Staff;
 
 const collectionName = 'staffs';
 
+// Define the consultantSchema
+const consultantSchema = new mongoose.Schema({
+  firstname: {
+    type: String,
+    required: true
+  },
+  surname: {
+    type: String,
+    required: true
+  }
+});
+
+// Create a model using the consultantSchema
+const Consultant = mongoose.model('Consultant', consultantSchema);
+
+module.exports = Consultant;
+
+
+
+// Define the registrarSchema
+const registrarSchema = new mongoose.Schema({
+  firstname: {
+    type: String,
+    required: true
+  },
+  surname: {
+    type: String,
+    required: true
+  }
+});
+
+// Create a model using the consultantSchema
+const Registrar = mongoose.model('Registrar', registrarSchema);
+
+module.exports = Registrar;
+
+
+
+
+
+
+
+
+
 
 
 app.set('trust proxy', 1);
@@ -1307,6 +1351,40 @@ app.get('/download2', async (req, res) => {
     res.status(500).send('Error exporting data to Excel');
   }
 });
+
+
+
+// Handle the POST request for '/consmanage'
+app.post('/consmanage', async (req, res) => {
+  const { firstname, surname } = req.body;
+
+  console.log(firstname, surname);
+
+  if (req.body.add) {
+    console.log('Add pressed');
+    // If "Add" button was pressed, add a new consultant
+    try {
+      await Consultant.create({ firstname, surname });
+      console.log('Cons created');
+      res.redirect('/'); // Redirect to a success page or back to the form
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error adding consultant');
+    }
+  } else if (req.body.delete) {
+    // If "Delete" button was pressed, delete the consultant
+    try {
+      await Consultant.findOneAndDelete({ firstname, surname });
+      res.redirect('/'); // Redirect to a success page or back to the form
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error deleting consultant');
+    }
+  }
+});
+
+
+
 
 
 

@@ -157,6 +157,24 @@ input[type="range"] {
     </div>
 </form>
 </div>
+
+<p class="card-text">Add / Remove Consultant:</p>
+
+<form id="reportForm" action="/consmanage" method="post">
+  <div class="form-group">
+      <label for="firstname">First Name:</label>
+      <input type="text" class="form-control" id="firstname" name="firstname" required>
+  </div>
+
+  <div class="form-group">
+      <label for="surname">Surname:</label>
+      <input type="text" class="form-control" id="surname" name="surname" required>
+  </div>
+
+  <button type="submit" name="add" class="btn btn-primary">Add</button>
+  <button type="submit" name="delete" class="btn btn-danger">Delete</button>
+</form>
+
 </div>
 
 

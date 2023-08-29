@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer-core');
-
 async function createPDF(url) {
   try {
     const browser = await puppeteer.launch({
