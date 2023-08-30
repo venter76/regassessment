@@ -842,12 +842,21 @@ app.get('/homedashboard', checkAuthenticated, async function (req, res) {
 
 
 
-app.get('/assess', (req, res) => {
-  // ... other code ...
+app.get('/assess', async (req, res) => {
+   // Fetch all registrars from the database
+   let registrars = [];
+   try {
+     registrars = await Registrar.find();
+   } catch (err) {
+     console.error("Failed to retrieve registrars:", err);
+   }
+ 
+   // Pass the flash message and the registrars to the ejs template
+   res.render('assess.ejs', { success: req.flash('success'), registrars: registrars });
+ });
 
-  // Pass the flash message to the ejs template
-  res.render('assess.ejs', { success: req.flash('success') });
-});
+ 
+
 
 
 
@@ -1051,14 +1060,13 @@ app.post('/dateList2', async (req, res) => {
 });
 
 
-
-
-
-
 app.get('/admin', (req, res) => {
-  res.render('admin');
-  
+// Pass the flash message to the ejs template
+res.render('admin.ejs', { success: req.flash('success') });
 });
+
+
+
 
 
 
@@ -1356,36 +1364,88 @@ app.get('/download2', async (req, res) => {
 
 // Handle the POST request for '/consmanage'
 app.post('/consmanage', async (req, res) => {
-  const { firstname, surname } = req.body;
+  const { firstname, surname, action } = req.body;
 
-  console.log(firstname, surname);
-
-  if (req.body.add) {
-    console.log('Add pressed');
-    // If "Add" button was pressed, add a new consultant
+  if (action === 'add') {
     try {
       await Consultant.create({ firstname, surname });
-      console.log('Cons created');
-      res.redirect('/'); // Redirect to a success page or back to the form
+      req.flash('success', 'New consultant added successfully');
     } catch (error) {
       console.error(error);
-      res.status(500).send('Error adding consultant');
+      req.flash('success', 'Error adding consultant');
     }
-  } else if (req.body.delete) {
-    // If "Delete" button was pressed, delete the consultant
+  } else if (action === 'delete') {
     try {
       await Consultant.findOneAndDelete({ firstname, surname });
-      res.redirect('/'); // Redirect to a success page or back to the form
+      req.flash('success', 'Consultant deleted successfully');
     } catch (error) {
       console.error(error);
-      res.status(500).send('Error deleting consultant');
+      req.flash('success', 'Error deleting consultant');
     }
+  }
+
+  res.redirect('/admin');  // Assuming '/admin' is the route to render admin.ejs
+});
+
+
+
+
+// Handle the POST request for '/regmanage'
+app.post('/regmanage', async (req, res) => {
+  const { firstname, surname, action } = req.body;
+
+  if (action === 'add') {
+    try {
+      await Registrar.create({ firstname, surname });
+      req.flash('success', 'New registrar added successfully');
+    } catch (error) {
+      console.error(error);
+      req.flash('success', 'Error adding registrar');
+    }
+  } else if (action === 'delete') {
+    try {
+      await Registrar.findOneAndDelete({ firstname, surname });
+      req.flash('success', 'Registrar deleted successfully');
+    } catch (error) {
+      console.error(error);
+      req.flash('success', 'Error deleting registrar');
+    }
+  }
+
+  res.redirect('/admin');  // Assuming '/admin' is the route to render admin.ejs
+});
+
+
+
+app.get('/conslist', async (req, res) => {
+  try {
+      // Retrieve all consultants from the database
+      const consultants = await Consultant.find({});
+
+      // Render the conslist.ejs template and pass the consultants data
+      res.render('conslist.ejs', { consultants: consultants });
+  } catch (err) {
+      console.error("Error fetching consultants:", err);
+      res.status(500).send("Internal Server Error");
   }
 });
 
 
 
 
+
+app.get('/reglist', async (req, res) => {
+  try {
+      // Retrieve all consultants from the database
+      const registrars = await Registrar.find({});
+
+      // Render the conslist.ejs template and pass the consultants data
+      res.render('reglist.ejs', { registrars: registrars });
+  } catch (err) {
+      console.error("Error fetching registrars:", err);
+      res.status(500).send("Internal Server Error");
+  }
+});
 
 
 

@@ -201,7 +201,14 @@ label {
               <!-- <label for="regName">Choose a name:</label> -->
               <select class="form-control" id="regName" name="regName" required>
                 <option value="">Select</option>
-                <option value="Fahema Akoonjee">Fahema Akoonjee</option>
+                <% registrars.forEach(registrar => { %>
+                  <option value="<%= registrar.firstname %> <%= registrar.surname %>">
+                    <%= registrar.firstname %> <%= registrar.surname %>
+                  </option>
+                <% }) %>
+              </select>
+            
+                <!-- <option value="Fahema Akoonjee">Fahema Akoonjee</option>
                 <option value="Henry Aslett">Henry Aslett</option>
                 <option value="Maxine Atagana">Maxine Atagana</option>
                 <option value="Mevin Bhurtun">Mevin Bhurtun</option>
@@ -269,7 +276,7 @@ label {
                 <option value="Johann Buys">Johann Buys</option>
                 <option value="Prudence Ramolefhe">Prudence Ramolefhe</option>
                 <option value="Theo Masuku">Theo Masuku</option>
-              </select>
+              </select> -->
             </div>
             <br>
             
