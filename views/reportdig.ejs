@@ -362,6 +362,7 @@ const acaScoretotalValues = scoresData.map(score => score.acaScoretotal);
 const technicalScoretotalValues = scoresData.map(score => score.technicalScoretotal);
 const technicalPScoretotalValues = scoresData.map(score => score.technicalPScoretotal);
 const nonScoretotalValues = scoresData.map(score => score.nonScoretotal);
+const ratingValuefinal = scoresData.map(score => score.ratingValue);
 
 
   // const dates = scoresData.map(score => new Date(score.date));
@@ -397,6 +398,12 @@ const nonScoretotalValues = scoresData.map(score => score.nonScoretotal);
                 label: 'Non-technical Score',
                 data: nonScoretotalValues,
                 borderColor: 'green',
+                fill: false
+            },
+            {
+                label: 'Overall Impression',
+                data: ratingValuefinal,
+                borderColor: 'purple',
                 fill: false
             }
             // ... repeat for other scores

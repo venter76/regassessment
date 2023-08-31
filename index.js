@@ -341,6 +341,9 @@ const scoreSchema = new Schema({
   nonScoretotal: {
     type: Number,
   },
+  ratingValue: {
+    type: Number,
+  }
   
 });
 
@@ -874,6 +877,11 @@ const loggedInUserSurname = req.user.surname;
 
   let formData = req.body;
 
+// Log the ratingValue
+console.log("ratingValue:", formData.rating);
+
+
+
   // Handle form data
 
   for(let key in formData) {
@@ -904,7 +912,7 @@ const loggedInUserSurname = req.user.surname;
     redComments: formData.redComments,
   };
 
-  const scoreData = { ...formData };
+  const scoreData = { ...formData, ratingValue: formData.rating };
   delete scoreData.regName;
   delete scoreData.positiveComments;
   delete scoreData.negativeComments;
@@ -997,7 +1005,7 @@ const staff = new Staff({
 
 try {
   const savedStaff = await staff.save();
-  // console.log(savedStaff);
+  console.log(savedStaff);
 
   // Set the flash message
   req.flash('success', 'Data submitted');
@@ -1008,8 +1016,15 @@ try {
   // Log the success message
   console.log("Success message:", successMessage);
 
-  // Render the assess page with the success message
-  res.render('assess.ejs', { success: successMessage });
+  let registrars = [];
+try {
+  registrars = await Registrar.find();
+} catch (err) {
+  console.error("Failed to retrieve registrars:", err);
+}
+
+res.render('assess.ejs', { success: successMessage, registrars: registrars });
+
 
 } catch (err) {
   console.error(err);
@@ -1141,7 +1156,8 @@ app.get('/reportdig/:regName', async (req, res) => {
               acaScoretotal: score.acaScoretotal,
               technicalScoretotal: score.technicalScoretotal,
               technicalPScoretotal: score.technicalPScoretotal,
-              nonScoretotal: score.nonScoretotal
+              nonScoretotal: score.nonScoretotal,
+              ratingValue: score.ratingValue,
           };
           scoresData.push(scoreData);
       });
@@ -1211,6 +1227,8 @@ const scoreNameMapping = {
     nonScore6: "Professionalism",
     nonScore7: "Independance",
     nonScore8: "Logistics/Organisational Skills",
+
+    ratingValue: "Overall Impression",
 };
  
 
@@ -1294,7 +1312,7 @@ app.get('/download2', async (req, res) => {
       "Paeds epidural", "Supervision", 
       "Paeds care", "Supervision",
 
-      "Critical Descision", "Attention", "Communication Coll", "Communication Patient", "Presentation", "Professional", "Independance", "Logistics", 
+      "Critical Descision", "Attention", "Communication Coll", "Communication Patient", "Presentation", "Professional", "Independance", "Logistics", "Overall Impression", 
       "Positive Comments", "Critical Comments", "Red Flag Comments"
     ];
     
@@ -1329,7 +1347,7 @@ app.get('/download2', async (req, res) => {
         score.technicalPScore5, getScoreWord(score.techsuperPSc5),
         score.technicalPScore6, getScoreWord(score.techsuperPSc6),
         score.technicalPScore7, getScoreWord(score.techsuperPSc7),
-        score.nonScore1, score.nonScore2, score.nonScore3, score.nonScore4, score.nonScore5, score.nonScore6, score.nonScore7, score.nonScore8, obj.positiveComments, obj.negativeComments, obj.redComments
+        score.nonScore1, score.nonScore2, score.nonScore3, score.nonScore4, score.nonScore5, score.nonScore6, score.nonScore7, score.nonScore8, score.ratingValue, obj.positiveComments, obj.negativeComments, obj.redComments
               ];
     });
 
