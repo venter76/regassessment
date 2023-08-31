@@ -1060,6 +1060,9 @@ app.post('/dateList2', async (req, res) => {
 });
 
 
+
+
+
 app.get('/admin', (req, res) => {
 // Pass the flash message to the ejs template
 res.render('admin.ejs', { success: req.flash('success') });

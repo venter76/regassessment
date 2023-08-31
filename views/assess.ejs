@@ -122,6 +122,25 @@ label {
     font-size: 8px; /* Adjust to your preferred size */
 }
 
+.stars {
+    display: flex;
+    justify-content: center;
+    /* If you want to give some space between each star, you can use the following instead of margin in the .stars span */
+    gap: 20px;
+}
+
+.stars span {
+    cursor: pointer;
+    font-size: 24px;
+    color: yellow;
+    /* If you use gap in the .stars, you can remove the margin-right property */
+    /* margin-right: 5px; */
+}
+
+.stars span.selected {
+    color: blue;
+}
+
 
   
 
@@ -1699,6 +1718,33 @@ label {
       <input type="range" class="form-control-range slider" id="nonScore8" name="nonScore8" min="0" max="5" step="1" value="0" oninput="setHasInteracted('nonScore8')">
      
     </div>
+    </div>
+    </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card mb-4 mt-4 card-6" >
+          <div class="card-body">
+            <h3 id="title" style="color: whitesmoke; cursor: pointer;">Overall Impression</h3>
+            <hr id="divider"/>
+            
+
+            <div class="stars">
+              <span data-value="1">☆</span>
+              <span data-value="2">☆</span>
+              <span data-value="3">☆</span>
+              <span data-value="4">☆</span>
+              <span data-value="5">☆</span>
+          </div>
+          <br>
+          <p id="ratingText" style="color: whitesmoke; text-align: center;"></p>
+
+          <input type="hidden" id="ratingValue" name="rating" value="0">
+
+
+
+
+
 
             
               </div>
@@ -1756,7 +1802,7 @@ label {
       <div class="col-12">
         <div class="card mb-4" >
             <div class="card-body">
-              <h5 class="card-title">Negative comments:<sup><i class="fas fa-info-circle" data-bs-toggle="modal" data-bs-target="#red1" style="cursor:pointer; font-size:12px; color: gray;"></i></sup></h5>
+              <h5 class="card-title">Constructive critical comments:<sup><i class="fas fa-info-circle" data-bs-toggle="modal" data-bs-target="#red1" style="cursor:pointer; font-size:12px; color: gray;"></i></sup></h5>
               <!-- Modal -->
               <div class="modal fade" id="red1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -1825,6 +1871,12 @@ label {
 </div>
 
 
+
+
+
+
+
+
 <!-- SUBMIT Button -->
 
 
@@ -1847,6 +1899,12 @@ label {
 
      
                   
+
+
+
+
+
+
 
 
 
@@ -1961,6 +2019,51 @@ label {
       setInterval(updateClock, 1000);
     </script>
     
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    let stars = document.querySelectorAll('.stars span');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function(e) {
+            let value = e.currentTarget.getAttribute('data-value');
+            document.getElementById('ratingValue').value = value;
+
+            // Reset the color for all stars
+            stars.forEach(star => star.classList.remove('selected'));
+            
+            // Highlight the stars up to the clicked one
+            for (let i = 0; i < value; i++) {
+                stars[i].classList.add('selected');
+            }
+
+            // Update the text based on the selected star
+            let ratingText = '';
+            switch(value) {
+                case '1':
+                    ratingText = 'Significant Issues';
+                    break;
+                case '2':
+                    ratingText = 'Struggling';
+                    break;
+                case '3':
+                    ratingText = 'Meeting Expectations';
+                    break;
+                case '4':
+                    ratingText = 'Exceeding Expectations';
+                    break;
+                case '5':
+                    ratingText = 'Superstar!';
+                    break;
+            }
+
+            document.getElementById('ratingText').textContent = ratingText;
+        });
+    });
+});
+
+
+
+    </script>
 
 </body>
 
