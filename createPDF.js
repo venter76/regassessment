@@ -23,7 +23,7 @@ async function createPDF(url) {
     // const pdf = await page.pdf({ format: 'A4' });
 
     await page.emulateMediaType('screen');
-    const pdf = await page.pdf({ format: 'A4', landscape: true });
+    const pdf = await page.pdf({ format: 'A4', portrait: true });
 
 
     await browser.close();
