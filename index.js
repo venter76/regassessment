@@ -1078,7 +1078,7 @@ app.post('/dateList2', async (req, res) => {
 
 
 
-app.get('/admin', (req, res) => {
+app.get('/admin', checkAuthenticated, ensureAdmin, (req, res) => {
 // Pass the flash message to the ejs template
 res.render('admin.ejs', { success: req.flash('success') });
 });
@@ -1102,9 +1102,19 @@ app.get('/howto', (req, res) => {
 
 
 
-app.get('/report', checkAuthenticated, ensureAdmin, (req, res) => {
-  res.render('report');
-});
+app.get('/report', checkAuthenticated, ensureAdmin, async (req, res) => {
+   // Fetch all registrars from the database
+   let registrars = [];
+   try {
+     registrars = await Registrar.find();
+   } catch (err) {
+     console.error("Failed to retrieve registrars:", err);
+   }
+ 
+   // Pass the flash message and the registrars to the ejs template
+   res.render('report.ejs', { registrars: registrars });
+ });
+
 
 
 
@@ -1133,11 +1143,11 @@ app.get('/reportdig/:regName', async (req, res) => {
     let redCommentsArray = [];
 
 
-    console.log("Entering staffData loop...");
+    // console.log("Entering staffData loop...");
 
     staffData.forEach(doc => {
 
-      console.log("Processing a staff document...");
+      // console.log("Processing a staff document...");
       // console.log("Current doc:", JSON.stringify(doc, null, 2));
 
       // Push the comments from this document to the respective arrays
@@ -1274,6 +1284,110 @@ for (let key in analyzedScores) {
 
 
 // *****************************************************************
+
+app.get('/download1', async (req, res) => {
+  try {
+    // Fetch all records from the Staff collection
+    const staffRecords = await Staff.find({}).lean().exec();
+
+// Define the headers for Excel
+const headers = [
+  "_id",  
+  "Date","Registrar Name",  "Consultant Name", "Theatre / Clinic", 
+  "Pre-op Asess", "Peri-op Plan", "Clinical Knowledge", "Data Interpret", "Interest in Teaching",
+  "CVC Line", "Supervision", 
+  "Arterial Line", "Supervision", 
+  "Lumbar Epidural", "Supervision", 
+  "Thoracic Epidural", "Supervision", 
+  "Spinal Anaesthesia", "Supervision", 
+  "Nerve Blocks", "Supervision",
+  "Airway management", "Supervision", 
+  "Fibre-optic Intubation", "Supervision", 
+  "Double-lumen Tube", "Supervision", 
+  "FATE skill", "Supervision", 
+  "TOE skill", "Supervision", 
+  "Pulmonary Artery Catherter", "Supervision", 
+  "Haemodynamic management", "Supervision", 
+  "Paeds IV", "Supervision", 
+  "Paeds A-line", "Supervision", 
+  "Paeds CVP", "Supervision", 
+  "Paeds Airway", "Supervision", 
+  "Paeds caudal", "Supervision", 
+  "Paeds epidural", "Supervision", 
+  "Paeds care", "Supervision",
+
+  "Critical Descision", "Attention", "Communication Coll", "Communication Patient", "Presentation", "Professional", "Independance", "Logistics", "Overall Impression", 
+  "Positive Comments", "Critical Comments", "Red Flag Comments"
+];
+
+// Transform the data to match the Excel structure
+
+const transformedData = staffRecords.map(obj => {
+  const score = obj.scores[0] || {};
+
+  return [
+    obj._id, score.date, obj.regName, 
+    score.consName, score.theatreName, 
+    score.acaScore1, score.acaScore2, score.acaScore3, score.acaScore4, score.acaScore5, 
+    score.technicalScore1, getScoreWord(score.techsuperSc1),
+    score.technicalScore2, getScoreWord(score.techsuperSc2),
+    score.technicalScore3, getScoreWord(score.techsuperSc3),
+    score.technicalScore4, getScoreWord(score.techsuperSc4),
+    score.technicalScore5, getScoreWord(score.techsuperSc5),
+    score.technicalScore6, getScoreWord(score.techsuperSc6),
+    score.technicalScore7, getScoreWord(score.techsuperSc7),
+    score.technicalScore8, getScoreWord(score.techsuperSc8),
+    score.technicalScore9, getScoreWord(score.techsuperSc9),
+    score.technicalScore10, getScoreWord(score.techsuperSc10),
+    score.technicalScore11, getScoreWord(score.techsuperSc11),
+    score.technicalScore12, getScoreWord(score.techsuperSc12),
+    score.technicalScore13, getScoreWord(score.techsuperSc13),
+    score.technicalPScore1, getScoreWord(score.techsuperPSc1),
+    score.technicalPScore2, getScoreWord(score.techsuperPSc2),
+    score.technicalPScore3, getScoreWord(score.techsuperPSc3),
+    score.technicalPScore4, getScoreWord(score.techsuperPSc4),
+    score.technicalPScore5, getScoreWord(score.techsuperPSc5),
+    score.technicalPScore6, getScoreWord(score.techsuperPSc6),
+    score.technicalPScore7, getScoreWord(score.techsuperPSc7),
+    score.nonScore1, score.nonScore2, score.nonScore3, score.nonScore4, score.nonScore5, score.nonScore6, score.nonScore7, score.nonScore8, score.ratingValue, obj.positiveComments, obj.negativeComments, obj.redComments
+          ];
+});
+
+transformedData.unshift(headers);
+
+// Pass the transformed data to the export function
+
+const buffer = await exportToExceel(transformedData);
+
+// const buffer = await exportToExceel(wsData);
+
+ // Generate a timestamp for the filename
+ const now = new Date();
+ const timestamp = `all_records_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+
+
+// Set up response headers
+res.setHeader('Content-Disposition', `attachment; filename="output_${timestamp}.xlsx"`);
+res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+// Send buffer to client to trigger file download
+res.send(buffer);
+} catch (error) {
+console.error('Error exporting data to Excel:', error);
+res.status(500).send('Error exporting data to Excel');
+}
+});
+
+
+
+
+
+
+
+
+
+
+
 
 app.get('/download2', async (req, res) => {
   try {

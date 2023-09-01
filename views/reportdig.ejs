@@ -224,29 +224,53 @@ input[type="range"] {
   <div class="card-header">
     Scores
   </div>
+
   <div class="card-body">
-    <% for(let key in analyzedData) { %>
-        <p><strong><%= key %>:</strong> 
-            <% 
-                if (analyzedData[key].below !== 0) { 
-                    %> Number of Poor/Below Average:    <%= analyzedData[key].below %><% 
-                } 
-            %>
-            <% 
-                if (analyzedData[key].above !== 0) { 
-                    if (analyzedData[key].below !== 0) { %> , <% }
-                    %> Number of Excellent:     <%= analyzedData[key].above %><% 
-                } 
-            %>
-        </p>
-    <% } %>  
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <!-- Table Headers -->
+        <thead>
+            <tr>
+                <th style="border: 1px solid black; padding: 5px;">Key</th>
+                <th style="border: 1px solid black; padding: 5px;">Poor / Below Average</th>
+                <th style="border: 1px solid black; padding: 5px;">Excellent</th>
+            </tr>
+        </thead>
+        
+        <!-- Table Body -->
+        <tbody>
+            <% for(let key in analyzedData) { %>
+                <tr>
+                    <!-- Key -->
+                    <td style="border: 1px solid black; padding: 5px;"><%= key %></td>
+                    
+                    <!-- Poor / Below Average Data -->
+                    <td style="border: 1px solid black; padding: 5px;">
+                        <% if (analyzedData[key].below !== 0) { %>
+                            <%= analyzedData[key].below %> 
+                        <% } else { %>
+                            &nbsp;
+                        <% } %> 
+                    </td>
+                    
+                    <!-- Excellent Data -->
+                    <td style="border: 1px solid black; padding: 5px;">
+                        <% if (analyzedData[key].above !== 0) { %> 
+                            <%= analyzedData[key].above %> 
+                        <% } else { %>
+                            &nbsp;
+                        <% } %> 
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
 </div>
 
 
-  <!-- <div class="card-body">
-    <% for(let key in analyzedData) { %>
-      <p><strong><%= key %>:</strong> Below: <%= analyzedData[key].below %>, Above: <%= analyzedData[key].above %></p>
-    <% } %> -->
+  
+
+
+  
     
   </div>
 </div>
@@ -262,7 +286,7 @@ input[type="range"] {
       <div class="col-md-6">
         <div class="card">
             <!-- Trigger modal -->
-            <p class="card-text" style="color: whitesmoke; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#downloadModal">
+            <p class="card-text" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#downloadModal">
               <i class="fas fa-download"></i> Download:
           </p>
           
@@ -295,7 +319,7 @@ input[type="range"] {
 <div class="col-md-6">
   <div class="card">
       <!-- Trigger modal -->
-      <p class="card-text" style="color: whitesmoke; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#linkModal">
+      <p class="card-text" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#linkModal">
           <i class="fas fa-link"></i> Link:
       </p>
   </div>
@@ -312,7 +336,7 @@ input[type="range"] {
           </div>
           <div class="modal-body">
               <button onclick="window.location.href='/report'" class="btn btn-secondary btn-sm custom-width-btn">New Report</button>
-              <button onclick="window.location.href='/home'" class="btn btn-secondary btn-sm custom-width-btn">Home</button>
+              <button onclick="window.location.href='/homedashboard'" class="btn btn-secondary btn-sm custom-width-btn">Home</button>
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -426,7 +450,7 @@ const ratingValuefinal = scoresData.map(score => score.ratingValue);
             },
             y: {
                 min: 0, // This sets the minimum value of y-axis
-                max: 5, // This sets the maximum value of y-axis
+                max: 6, // This sets the maximum value of y-axis
                 title: {
                     display: true,
                     text: 'Score'
