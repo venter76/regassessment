@@ -1106,7 +1106,7 @@ app.get('/report', checkAuthenticated, ensureAdmin, async (req, res) => {
    // Fetch all registrars from the database
    let registrars = [];
    try {
-     registrars = await Registrar.find();
+    registrars = await Registrar.find().sort({ surname: 1 });  // Sorting by surname in ascending order
    } catch (err) {
      console.error("Failed to retrieve registrars:", err);
    }
@@ -1125,12 +1125,25 @@ app.get('/report', checkAuthenticated, ensureAdmin, async (req, res) => {
 
 // PLACE NAME ADJUSTERS *************************************************
 
-app.get('/reportdig/:regName', async (req, res) => {
+app.post('/reportdig', async (req, res) => {
    
-  let regName = req.params.regName;
+  let regName = req.body.regName;
+  let dateFrom = new Date(req.body.dateFrom); 
+  let dateTo = new Date(req.body.dateTo); 
+
+
+  // Logging the values
+console.log("regName:", regName);
+console.log("dateFrom:", dateFrom);
+console.log("dateTo:", dateTo);
+  
   try {
-    // If you wanted to sort at the database level, but 'date' is in a nested array, you might not be able to do this directly here.
-    const staffData = await Staff.find({ regName: regName });
+    const staffData = await Staff.find({
+      regName: regName,
+      "scores.date": { $gte: dateFrom, $lte: dateTo }  // adjusted to look into scores.date
+    });
+
+
 
     if (!staffData || staffData.length === 0) {
       console.log(`No staff found with regName: ${regName}`);
