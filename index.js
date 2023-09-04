@@ -696,72 +696,86 @@ app.get('/forgotpassword', function(req, res) {
 
 
 
-app.post('/forgotpassword', function(req, res, next) {
-  crypto.randomBytes(20, function(err, buf) {
-    const token = buf.toString('hex');
+app.post('/forgotpassword', async function(req, res, next) {
+  try {
+      const buf = await crypto.randomBytes(20);
+      const token = buf.toString('hex');
 
-    User.findOne({ username: req.body.username }, function(err, user) {
+      const user = await User.findOne({ username: req.body.username });
+
       if (!user) {
-        // handle error: no user with this email
-        console.log('No user with this email address');
-        res.send("No user registered with this email address");
-        res.redirect('/forgotpassword');
+          console.log('No user with this email address');
+          return res.redirect('/forgotpassword?message=No%20user%20registered%20with%20this%20email%20address');
       }
-      
 
       user.resetPasswordToken = token;
-      user.resetPasswordExpires = Date.now() + 10800000; // 1 hour
+      user.resetPasswordExpires = Date.now() + 10800000; // 3 hours
       console.log(new Date(user.resetPasswordExpires));
 
-      user.save(function(err) {
-        if(err) {
-          console.log(err);
-          // handle error
-          return res.redirect('/forgotpassword');
-        }
+      await user.save(); // Use await here instead of the callback
 
-        const mailOptions = {
+      const mailOptions = {
           to: user.username,
           from: 'brayroadapps@gmail.com',
           subject: 'Node.js Password Reset',
           text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-            'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-        };
+          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+          'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+      };
 
-        transporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-            console.log(error);
-            return res.redirect('/forgotpassword');
-          } else {
-            console.log('Email sent: ' + info.response);
-            return res.redirect('/forgotpassword?message=Email%20has%20been%20sent%20with%20further%20instructions');
-          }
-        });
+      // Convert sendMail to Promise
+      const info = await new Promise((resolve, reject) => {
+          transporter.sendMail(mailOptions, (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+          });
       });
-    });
-  });
+
+      console.log('Email sent: ' + info.response);
+      return res.redirect('/forgotpassword?message=Email%20has%20been%20sent%20with%20further%20instructions');
+  
+  } catch (error) {
+      console.error("Error occurred:", error);
+      return res.redirect('/forgotpassword?message=An%20error%20occurred');
+  }
 });
 
+    
 
-app.get('/reset/:token', function(req, res) {
-  User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+app.get('/reset/:token', async function(req, res, next) {
+  try {
+    const user = await User.findOne({ 
+      resetPasswordToken: req.params.token, 
+      resetPasswordExpires: { $gt: Date.now() } 
+    });
+
     if (!user) {
       // handle error: no user with this token, or token expired
       console.log('Password reset token is invalid or has expired.');
       return res.redirect('/forgotpassword?message=Password%20reset%20token%20is%20invalid%20or%20has%20expired');
     }
+
     // if user found, render a password reset form
     res.render('reset', {
       token: req.params.token
     });
-  });
+  } catch (err) {
+    console.error("Error occurred:", err);
+    next(err); // pass the error to your error-handling middleware, if you have one
+  }
 });
 
 
-app.post('/reset/:token', function(req, res) {
-  User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+
+
+app.post('/reset/:token', async function(req, res, next) {
+  try {
+    const user = await User.findOne({ 
+      resetPasswordToken: req.params.token, 
+      resetPasswordExpires: { $gt: Date.now() } 
+    });
+
     if (!user) {
       console.log('Password reset token is invalid or has expired.');
       return res.redirect('/forgotpassword?message=Password%20reset%20token%20is%20invalid%20or%20has%20expired');
@@ -769,36 +783,34 @@ app.post('/reset/:token', function(req, res) {
 
     // Check if passwords match
     if (req.body.password !== req.body.passwordConfirm) {
-      // Handle error: passwords do not match
       console.log('Passwords do not match');
       return res.redirect('/forgotpassword?message=Passwords%20do%20not%20match');
-    } 
+    }
 
-    user.setPassword(req.body.password, function(err) {
-      if(err) {
-        console.log(err);
-        return res.redirect('/forgotpassword');
-      }
-      
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
+    // Assuming you have an asynchronous setPassword function. 
+    // If this isn't the case, please let me know so we can address it.
+    await user.setPassword(req.body.password);
 
-      user.save(function(err) {
-        if(err) {
-          console.log(err);
-          return res.redirect('/forgotpassword');
-        }
-        // Log the user in and redirect them somewhere
-        req.logIn(user, function(err) {
-          res.redirect('/');
-        });
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    // Wrap req.logIn in a promise
+    await new Promise((resolve, reject) => {
+      req.logIn(user, (err) => {
+        if (err) reject(err);
+        else resolve();
       });
     });
-  });
+
+    res.redirect('/');
+
+  } catch (err) {
+    console.error("Error occurred:", err);
+    next(err); 
+  }
 });
-
-
-
 
 
 
