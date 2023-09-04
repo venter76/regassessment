@@ -138,6 +138,13 @@ input[type="range"] {
 
   <div class="container">
  
+    <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+      <div class="alert alert-danger">
+        <%= error[0] %>  <!-- Displaying the first error message -->
+      </div>
+    <% } %>
+    
+
     <div class="row">
     <div class="col-12">
     <div class="card mb-4 mt-3" >
@@ -285,6 +292,16 @@ input[type="range"] {
   }
   
   </script>
+
+<script>
+  setTimeout(function() {
+      const alertElement = document.querySelector('.alert');
+      if (alertElement) {
+          alertElement.style.display = 'none';
+      }
+  }, 3000); // 3000ms = 3 seconds
+</script>
+
 
 </body>
 </html>

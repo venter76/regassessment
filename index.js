@@ -1124,10 +1124,10 @@ app.get('/report', checkAuthenticated, ensureAdmin, async (req, res) => {
    }
  
    // Pass the flash message and the registrars to the ejs template
-   res.render('report.ejs', { registrars: registrars });
+   res.render('report.ejs', { registrars: registrars, error: req.flash('error') });
  });
 
-
+ 
 
 
 
@@ -1140,27 +1140,41 @@ app.get('/report', checkAuthenticated, ensureAdmin, async (req, res) => {
 app.post('/reportdig', async (req, res) => {
    
   let regName = req.body.regName;
-  let dateFrom = new Date(req.body.dateFrom); 
-  let dateTo = new Date(req.body.dateTo); 
 
+  // Check if date values are provided before creating Date objects
+  let dateFrom = req.body.dateFrom ? new Date(req.body.dateFrom) : null;
+  let dateTo = req.body.dateTo ? new Date(req.body.dateTo) : null;
 
-  // Logging the values
-console.log("regName:", regName);
-console.log("dateFrom:", dateFrom);
-console.log("dateTo:", dateTo);
+  console.log("regName:", regName);
+  console.log("dateFrom:", dateFrom);
+  console.log("dateTo:", dateTo);
   
   try {
-    const staffData = await Staff.find({
-      regName: regName,
-      "scores.date": { $gte: dateFrom, $lte: dateTo }  // adjusted to look into scores.date
-    });
+    // Create a base query and then conditionally add date range
+    let query = { regName: regName };
+    
+    if (dateFrom && dateTo) {
+      query["scores.date"] = { $gte: dateFrom, $lte: dateTo };
+    }
 
-
+    const staffData = await Staff.find(query);
 
     if (!staffData || staffData.length === 0) {
-      console.log(`No staff found with regName: ${regName}`);
-      return res.status(404).send(`No staff found with regName: ${regName}`);
+      console.log(`No staff found with name: ${regName}`);
+      
+      // Set the flash message
+      req.flash('error', `No data for selected dates for: ${regName}`);
+      
+      
+      return res.redirect('/report');
     }
+
+
+
+    // if (!staffData || staffData.length === 0) {
+    //   console.log(`No staff found with regName: ${regName}`);
+    //   return res.status(404).send(`No staff found with regName: ${regName}`);
+    // }
 
     let scoresData = []; // This will contain all the score data for each staff member
     let positiveCommentsArray = [];
@@ -1300,6 +1314,7 @@ for (let key in analyzedScores) {
     res.status(500).send('Server Error');
   }
 });
+
 
 
 
