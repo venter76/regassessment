@@ -502,7 +502,7 @@ app.use(session({
 
 app.get('/', redirectToDashboardIfAuthenticated, (req, res) => {
   // Render login page
-  res.render('home2');
+  res.render('home');
 });
 
 // app.get("/", function(req, res){
@@ -512,9 +512,14 @@ app.get('/', redirectToDashboardIfAuthenticated, (req, res) => {
 
 
 
-app.get("/login", function(req, res){
-  res.render("login", { message: req.query.message });
+app.get('/login', (req, res) => {
+  res.render('login', { 
+    success: req.flash('success'),
+    error: req.flash('error') 
+  });
 });
+
+
 
 
 app.post("/login", function(req, res, next) {
@@ -525,14 +530,25 @@ app.post("/login", function(req, res, next) {
     }
 
     if (!user) {
-      // Authentication failed, redirect back to the login page
-      return res.redirect("/login?message=Incorrect%20username%20or%20password");
+      // Authentication failed, set flash error message
+      req.flash('error', 'Incorrect username or password');
+      return res.redirect("/login");
     }
 
     if (user.verificationToken !== null) {
       console.log("No user found");
-      return res.redirect("/login?message=Email%20not%20verified");
+      req.flash('error', 'Email not verified');
+      return res.redirect("/login");
     }
+    // if (!user) {
+    //   // Authentication failed, redirect back to the login page
+    //   return res.redirect("/login?message=Incorrect%20username%20or%20password");
+    // }
+
+    // if (user.verificationToken !== null) {
+    //   console.log("No user found");
+    //   return res.redirect("/login?message=Email%20not%20verified");
+    // }
 
     req.login(user, function(err) {
       if (err) {
@@ -610,6 +626,8 @@ app.get('/register', function(req, res) {
 });
 
 
+
+
 app.post('/register', async function(req, res) {
   // Check if passwords match
   if (req.body.password !== req.body.passwordConfirm) {
@@ -675,6 +693,10 @@ app.get('/verify', async function(req, res) {
       try {
           await user.save();
           console.log('Email verified for user');
+
+          // Add the success message using flash
+          req.flash('success', 'Email verified for user');
+          
           res.redirect('/login');
       } catch (saveErr) {
           console.log('Error saving user:', saveErr);
