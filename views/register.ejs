@@ -79,11 +79,11 @@
 
 
   .card {
-    background-color: #49525e; 
+    background-color: #8d9094; 
 }
 
 .form-control {
-    background-color: gray; /* Use the desired color */
+    background-color: rgb(240, 238, 238); /* Use the desired color */
 }
 
 #title {
@@ -138,17 +138,23 @@ input[type="range"] {
 <div class="container mt-5">
   <h1>Register</h1>
 
-  <% if (message === 'verification') { %>
-    <div class="alert alert-success" role="alert">
-      Please check your email to verify your registration.
+  <% if (success && success.length > 0) { %>
+    <div class="alert alert-success">
+      <%= success[0] %>  <!-- Displaying the first message -->
     </div>
   <% } %>
 
-  <% if (typeof error !== 'undefined') { %>
-    <div class="alert alert-warning">
-        <%= error %>
+  <% if (error && error.length > 0) { %>
+    <div class="alert alert-danger error-message" role="alert">
+        <%= error[0] %>
     </div>
 <% } %>
+
+  <!-- <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+    <div class="alert alert-danger">
+        <%= error[0] %>   Displaying the first error message -->
+    <!-- </div>
+<% } %> --> 
 
   <div class="row">
     <div class="col-sm-8">

@@ -501,13 +501,14 @@ app.use(session({
 
 
 app.get('/', redirectToDashboardIfAuthenticated, (req, res) => {
-  // Render login page
-  res.render('home');
+  res.render('home', { 
+      success: req.flash('success'),
+      error: req.flash('error')
+  });
 });
 
-// app.get("/", function(req, res){
-//   res.render("home2");
-// });
+
+
 
 
 
@@ -618,57 +619,117 @@ app.post('/welcome', async (req, res) => {
 });
 
 
-
-
 app.get('/register', function(req, res) {
-  const errorMessage = req.query.error;
-  res.render('register', { message: req.query.message, error: errorMessage });
-});
+
+  console.log('Entered register GET route');
+  res.render('register', { 
+    success: req.flash('success'),
+    error: req.flash('error') 
+  });
+  });
 
 
 
 
 app.post('/register', async function(req, res) {
+  console.log('Entered register POST route');
   // Check if passwords match
   if (req.body.password !== req.body.passwordConfirm) {
       console.log('Passwords do not match');
+      req.flash('error', 'Passwords do not match.');
       return res.redirect('/register');
-  } else {
-      try {
-          const user = await User.register({ username: req.body.username, active: false }, req.body.password);
+  }
 
-          // Generate a verification token
-          const verificationToken = uuidv4();
-          user.verificationToken = verificationToken;
+  const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{7,}$/;
+    if (!passwordPattern.test(req.body.password)) {
+        console.log('Password does not meet requirements.');
+        req.flash('error', 'Password must be minimum 7 characters with at least 1 capital letter and 1 number.');
+        return res.redirect("/register");
+    }
 
-          await user.save();
-
-          // Send verification email
-          const verificationLink = `${process.env.APP_URL}/verify?token=${verificationToken}`;
-          const email = {
-              from: 'brayroadapps@gmail.com',
-              to: user.username,
-              subject: 'Email Verification',
-              text: `Please click the following link to verify your email address: ${verificationLink}`,
-          };
-
-          try {
-              await transporter.sendMail(email);
-              console.log('Verification email sent');
-              res.redirect('/register?message=verification'); // Redirect with success message
-          } catch (mailError) {
-              console.log('Error sending email:', mailError);
-              res.redirect('/register?error=mail');
-          }
-      } catch (err) {
-          console.log(err);
-          if (err.name === 'UserExistsError') {
-              return res.redirect('/register?error=User%20already%20exists.%20Select%20Login.');
-          }
-          return res.redirect('/home2');
+  try {
+      const existingUser = await User.findOne({ username: req.body.username });
+      if (existingUser) {
+          req.flash('error', 'User already exists. Please login.');
+          return res.redirect('/login');
       }
+
+      const user = await User.register({ username: req.body.username, active: false }, req.body.password);
+
+      // Generate a verification token
+      const verificationToken = uuidv4();
+      user.verificationToken = verificationToken;
+
+      await user.save();
+
+      // Send verification email
+      const verificationLink = `${process.env.APP_URL}/verify?token=${verificationToken}`;
+      const email = {
+          from: 'brayroadapps@gmail.com',
+          to: user.username,
+          subject: 'Email Verification',
+          text: `Please click the following link to verify your email address: ${verificationLink}`,
+      };
+
+      try {
+          await transporter.sendMail(email);
+          console.log('Verification email sent');
+          req.flash('success', 'Verification email has been sent.');
+          res.redirect('/register');
+      } catch (mailError) {
+          console.log('Error sending email:', mailError);
+          req.flash('error', 'Failed to send verification email.');
+          res.redirect('/register');
+      }
+  } catch (err) {
+      console.log(err);
+      req.flash('error', 'An unexpected error occurred.');
+      return res.redirect('/home');
   }
 });
+
+
+// app.post('/register', async function(req, res) {
+//   // Check if passwords match
+//   if (req.body.password !== req.body.passwordConfirm) {
+//       console.log('Passwords do not match');
+//       return res.redirect('/register');
+//   } else {
+//       try {
+//           const user = await User.register({ username: req.body.username, active: false }, req.body.password);
+
+//           // Generate a verification token
+//           const verificationToken = uuidv4();
+//           user.verificationToken = verificationToken;
+
+//           await user.save();
+
+//           // Send verification email
+//           const verificationLink = `${process.env.APP_URL}/verify?token=${verificationToken}`;
+//           const email = {
+//               from: 'brayroadapps@gmail.com',
+//               to: user.username,
+//               subject: 'Email Verification',
+//               text: `Please click the following link to verify your email address: ${verificationLink}`,
+//           };
+
+//           try {
+//               await transporter.sendMail(email);
+//               console.log('Verification email sent');
+//               res.redirect('/register?message=verification'); // Redirect with success message
+//           } catch (mailError) {
+//               console.log('Error sending email:', mailError);
+//               res.redirect('/register?error=mail');
+//           }
+//       } catch (err) {
+//           console.log(err);
+//           if (err.name === 'UserExistsError') {
+//               return res.redirect('/register?error=User%20already%20exists.%20Select%20Login.');
+//           }
+//           return res.redirect('/home');
+//       }
+//   }
+// });
 
 
 
@@ -780,14 +841,14 @@ app.get('/reset/:token', async function(req, res, next) {
 
     // if user found, render a password reset form
     res.render('reset', {
-      token: req.params.token
+      token: req.params.token,
+      error: req.flash('error')
     });
   } catch (err) {
     console.error("Error occurred:", err);
     next(err); // pass the error to your error-handling middleware, if you have one
   }
 });
-
 
 
 
@@ -803,14 +864,21 @@ app.post('/reset/:token', async function(req, res, next) {
       return res.redirect('/forgotpassword?message=Password%20reset%20token%20is%20invalid%20or%20has%20expired');
     }
 
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{7,}$/;
+    if (!passwordPattern.test(req.body.password)) {
+        console.log('Password does not meet requirements.');
+        req.flash('error', 'Password must be minimum 7 characters with at least 1 capital letter and 1 number.');
+        return res.redirect("/reset");
+    }
+
     // Check if passwords match
     if (req.body.password !== req.body.passwordConfirm) {
       console.log('Passwords do not match');
-      return res.redirect('/forgotpassword?message=Passwords%20do%20not%20match');
+      req.flash('error', 'Passwords do not match');
+      return res.redirect("/reset");
     }
 
     // Assuming you have an asynchronous setPassword function. 
-    // If this isn't the case, please let me know so we can address it.
     await user.setPassword(req.body.password);
 
     user.resetPasswordToken = undefined;
@@ -833,6 +901,56 @@ app.post('/reset/:token', async function(req, res, next) {
     next(err); 
   }
 });
+
+
+
+
+
+
+// app.post('/reset/:token', async function(req, res, next) {
+//   try {
+//     const user = await User.findOne({ 
+//       resetPasswordToken: req.params.token, 
+//       resetPasswordExpires: { $gt: Date.now() } 
+//     });
+
+//     if (!user) {
+//       console.log('Password reset token is invalid or has expired.');
+//       return res.redirect('/forgotpassword?message=Password%20reset%20token%20is%20invalid%20or%20has%20expired');
+//     }
+
+//     // Check if passwords match
+//     if (req.body.password !== req.body.passwordConfirm) {
+//       console.log('Passwords do not match');
+//       req.flash('error', 'Passwords do not match');
+//       return res.redirect("/reset");
+      
+//     }
+
+//     // Assuming you have an asynchronous setPassword function. 
+//     // If this isn't the case, please let me know so we can address it.
+//     await user.setPassword(req.body.password);
+
+//     user.resetPasswordToken = undefined;
+//     user.resetPasswordExpires = undefined;
+
+//     await user.save();
+
+//     // Wrap req.logIn in a promise
+//     await new Promise((resolve, reject) => {
+//       req.logIn(user, (err) => {
+//         if (err) reject(err);
+//         else resolve();
+//       });
+//     });
+
+//     res.redirect('/');
+
+//   } catch (err) {
+//     console.error("Error occurred:", err);
+//     next(err); 
+//   }
+// });
 
 
 

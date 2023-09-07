@@ -36,7 +36,7 @@
     }
 
     #current-date {
-      font-size: 4vw;
+      font-size: 3vw;
       padding-top: 1vh ;
       color: rgba(245, 245, 245, 0.686);
     }
@@ -139,23 +139,33 @@ input[type="range"] {
 <br>
 
 <div class="jumbotron centered">
-  <div class="container">
-    <br>
-    <div style="display: flex; align-items: center;"> <!-- Flexbox container -->
-      <p class="lead" style="margin-right: 10px;">First time user: Click here</p> <!-- Added a margin for spacing -->
-      <a class="btn btn-dark btn-lg" href="/register" role="button">Register</a>
-  </div>
-  <hr>
-  <div style="display: flex; align-items: center;"> <!-- Flexbox container -->
-    <p class="lead" style="margin-right: 10px;">Returning user: Click here</p> <!-- Added a margin for spacing -->
-    <a class="btn btn-dark btn-lg" href="/login" role="button">Login</a>
+  <% if (success && success.length > 0) { %>
+    <div class="alert alert-success">
+      <%= success[0] %>  <!-- Displaying the first message -->
+    </div>
+  <% } %>
 
-  </div>
-  <hr>
-  <div style="display: flex; align-items: center;"> <!-- Flexbox container -->
-    <p class="lead" style="margin-right: 10px;">Forgot password:</p>
-    <a class="btn btn-dark btn-lg" href="/forgotpassword" role="button">Click Here</a>
+  <% if (error && error.length > 0) { %>
+    <div class="alert alert-danger error-message" role="alert">
+        <%= error[0] %>
+    </div>
+<% } %>
+
+<div style="display: flex; flex-direction: column; align-items: start;"> <!-- Flexbox container -->
+  <p class="lead">First time user:</p>
+  <a href="/register" role="button" style="color: black; text-decoration: none;">Click here</a>
 </div>
+<hr>
+<div style="display: flex; flex-direction: column; align-items: start;"> <!-- Flexbox container -->
+  <p class="lead">Returning user:</p>
+  <a href="/login" role="button" style="color: black; text-decoration: none;">Click here</a>
+</div>
+<hr>
+<div style="display: flex; flex-direction: column; align-items: start;"> <!-- Flexbox container -->
+  <p class="lead">Forgot password:</p>
+  <a href="/forgotpassword" role="button" style="color: black; text-decoration: none;">Click here</a>
+</div>
+
 
 
   </div>
