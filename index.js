@@ -107,6 +107,7 @@ module.exports = User;
 
 
 
+
 const scoreSchema = new Schema({
   date: {
     type: Date,
@@ -468,6 +469,22 @@ app.use(session({
 
 
 
+
+  const rateLimit = require('express-rate-limit');
+
+  // Define a limiter middleware for login attempts
+  const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 8, // limit each IP to 5 requests per windowMs
+    message: 'Too many login attempts, please try again in 15 minutes.'
+  });
+  
+  // Apply the rate limiter middleware to your login route
+  app.use('/login', loginLimiter);
+
+
+
+
   const getScoreWord = (num) => {
     const number = parseInt(num, 10);
     console.log(`Converting: ${num} (Type: ${typeof num}) to ${number}`);
@@ -522,9 +539,9 @@ app.get('/login', (req, res) => {
 
 
 
-
-app.post("/login", function(req, res, next) {
+app.post("/login", loginLimiter, function(req, res, next) {
   passport.authenticate("local", function(err, user, info) {
+
     if (err) {
       console.log(err);
       return next(err); // Pass the error to the next middleware
@@ -541,15 +558,7 @@ app.post("/login", function(req, res, next) {
       req.flash('error', 'Email not verified');
       return res.redirect("/login");
     }
-    // if (!user) {
-    //   // Authentication failed, redirect back to the login page
-    //   return res.redirect("/login?message=Incorrect%20username%20or%20password");
-    // }
-
-    // if (user.verificationToken !== null) {
-    //   console.log("No user found");
-    //   return res.redirect("/login?message=Email%20not%20verified");
-    // }
+    
 
     req.login(user, function(err) {
       if (err) {
