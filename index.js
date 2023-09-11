@@ -13,7 +13,7 @@ const fs = require('fs');
 const cron = require('node-cron');
 
 // Read the service account JSON file
-const rawData = fs.readFileSync('serviceAccountKey.json');
+const rawData = fs.readFileSync('google-credentials.json');
 const serviceAccount = JSON.parse(rawData);
 
 
