@@ -6,6 +6,16 @@ const { Schema } = mongoose;
 const crypto = require('crypto');
 const checkAuthenticated = require('./authenticate.js');
 const redirectToDashboardIfAuthenticated = require('./redirectToDashboardIfAuthenticated');
+const pushToGoogleSheet = require('./googleSheetsModule');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+const moment = require('moment');
+const fs = require('fs');
+const cron = require('node-cron');
+
+// Read the service account JSON file
+const rawData = fs.readFileSync('serviceAccountKey.json');
+const serviceAccount = JSON.parse(rawData);
+
 
 
 
@@ -370,7 +380,8 @@ const staffSchema = new Schema({
   redComments: {
     type: String,
     default: ''
-  }
+  },
+  sheet: { type: String, default: '' }
 });
 
 const Staff = mongoose.model('Staff', staffSchema);
@@ -475,7 +486,7 @@ app.use(session({
   // Define a limiter middleware for login attempts
   const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 8, // limit each IP to 5 requests per windowMs
+    max: 15, // limit each IP to 5 requests per windowMs
     message: 'Too many login attempts, please try again in 15 minutes.'
   });
   
@@ -502,6 +513,89 @@ app.use(session({
             return num; // If no match, return the original value.
     }
 };
+
+
+
+
+
+
+async function fetchAndPushDataToSheets() {
+  const staffRecords = await Staff.find({ sheet: '' }).lean().exec();
+  
+  // Define the headers for Excel
+const headers = [
+  "_id",  
+  "Date","Registrar Name",  "Consultant Name", "Theatre / Clinic", 
+  "Pre-op Asess", "Peri-op Plan", "Clinical Knowledge", "Data Interpret", "Interest in Teaching",
+  "CVC Line", "Supervision1", 
+  "Arterial Line", "Supervision2", 
+  "Lumbar Epidural", "Supervision3", 
+  "Thoracic Epidural", "Supervision4", 
+  "Spinal Anaesthesia", "Supervision5", 
+  "Nerve Blocks", "Supervision6",
+  "Airway management", "Supervision7", 
+  "Fibre-optic Intubation", "Supervision8", 
+  "Double-lumen Tube", "Supervision9", 
+  "FATE skill", "Supervision10", 
+  "TOE skill", "Supervision11", 
+  "Pulmonary Artery Catherter", "Supervision12", 
+  "Haemodynamic management", "Supervision13", 
+  "Paeds IV", "Supervision14", 
+  "Paeds A-line", "Supervision15", 
+  "Paeds CVP", "Supervision16", 
+  "Paeds Airway", "Supervision17", 
+  "Paeds caudal", "Supervision18", 
+  "Paeds epidural", "Supervision19", 
+  "Paeds care", "Supervision20",
+
+  "Critical Descision", "Attention", "Communication Coll", "Communication Patient", "Presentation", "Professional", "Independance", "Logistics", "Overall Impression", 
+  "Positive Comments", "Critical Comments", "Red Flag Comments"
+];
+
+// Transform the data to match the Excel structure
+
+const transformedData = staffRecords.map(obj => {
+  const score = obj.scores[0] || {};
+
+  return [
+    obj._id, score.date, obj.regName, 
+    score.consName, score.theatreName, 
+    score.acaScore1, score.acaScore2, score.acaScore3, score.acaScore4, score.acaScore5, 
+    score.technicalScore1, getScoreWord(score.techsuperSc1),
+    score.technicalScore2, getScoreWord(score.techsuperSc2),
+    score.technicalScore3, getScoreWord(score.techsuperSc3),
+    score.technicalScore4, getScoreWord(score.techsuperSc4),
+    score.technicalScore5, getScoreWord(score.techsuperSc5),
+    score.technicalScore6, getScoreWord(score.techsuperSc6),
+    score.technicalScore7, getScoreWord(score.techsuperSc7),
+    score.technicalScore8, getScoreWord(score.techsuperSc8),
+    score.technicalScore9, getScoreWord(score.techsuperSc9),
+    score.technicalScore10, getScoreWord(score.techsuperSc10),
+    score.technicalScore11, getScoreWord(score.techsuperSc11),
+    score.technicalScore12, getScoreWord(score.techsuperSc12),
+    score.technicalScore13, getScoreWord(score.techsuperSc13),
+    score.technicalPScore1, getScoreWord(score.techsuperPSc1),
+    score.technicalPScore2, getScoreWord(score.techsuperPSc2),
+    score.technicalPScore3, getScoreWord(score.techsuperPSc3),
+    score.technicalPScore4, getScoreWord(score.techsuperPSc4),
+    score.technicalPScore5, getScoreWord(score.techsuperPSc5),
+    score.technicalPScore6, getScoreWord(score.techsuperPSc6),
+    score.technicalPScore7, getScoreWord(score.techsuperPSc7),
+    score.nonScore1, score.nonScore2, score.nonScore3, score.nonScore4, score.nonScore5, score.nonScore6, score.nonScore7, score.nonScore8, score.ratingValue, obj.positiveComments, obj.negativeComments, obj.redComments
+          ];
+});
+
+transformedData.unshift(headers);
+
+  await pushToGoogleSheet(transformedData);
+  await Staff.updateMany({ sheet: '' }, { sheet: 'Y' });
+
+  console.log('Data successfully pushed to Google Sheets!');
+}
+
+
+
+
 
 
 
@@ -1476,96 +1570,44 @@ for (let key in analyzedScores) {
 
 app.get('/download1', async (req, res) => {
   try {
-    // Fetch all records from the Staff collection
-    const staffRecords = await Staff.find({}).lean().exec();
-
-// Define the headers for Excel
-const headers = [
-  "_id",  
-  "Date","Registrar Name",  "Consultant Name", "Theatre / Clinic", 
-  "Pre-op Asess", "Peri-op Plan", "Clinical Knowledge", "Data Interpret", "Interest in Teaching",
-  "CVC Line", "Supervision", 
-  "Arterial Line", "Supervision", 
-  "Lumbar Epidural", "Supervision", 
-  "Thoracic Epidural", "Supervision", 
-  "Spinal Anaesthesia", "Supervision", 
-  "Nerve Blocks", "Supervision",
-  "Airway management", "Supervision", 
-  "Fibre-optic Intubation", "Supervision", 
-  "Double-lumen Tube", "Supervision", 
-  "FATE skill", "Supervision", 
-  "TOE skill", "Supervision", 
-  "Pulmonary Artery Catherter", "Supervision", 
-  "Haemodynamic management", "Supervision", 
-  "Paeds IV", "Supervision", 
-  "Paeds A-line", "Supervision", 
-  "Paeds CVP", "Supervision", 
-  "Paeds Airway", "Supervision", 
-  "Paeds caudal", "Supervision", 
-  "Paeds epidural", "Supervision", 
-  "Paeds care", "Supervision",
-
-  "Critical Descision", "Attention", "Communication Coll", "Communication Patient", "Presentation", "Professional", "Independance", "Logistics", "Overall Impression", 
-  "Positive Comments", "Critical Comments", "Red Flag Comments"
-];
-
-// Transform the data to match the Excel structure
-
-const transformedData = staffRecords.map(obj => {
-  const score = obj.scores[0] || {};
-
-  return [
-    obj._id, score.date, obj.regName, 
-    score.consName, score.theatreName, 
-    score.acaScore1, score.acaScore2, score.acaScore3, score.acaScore4, score.acaScore5, 
-    score.technicalScore1, getScoreWord(score.techsuperSc1),
-    score.technicalScore2, getScoreWord(score.techsuperSc2),
-    score.technicalScore3, getScoreWord(score.techsuperSc3),
-    score.technicalScore4, getScoreWord(score.techsuperSc4),
-    score.technicalScore5, getScoreWord(score.techsuperSc5),
-    score.technicalScore6, getScoreWord(score.techsuperSc6),
-    score.technicalScore7, getScoreWord(score.techsuperSc7),
-    score.technicalScore8, getScoreWord(score.techsuperSc8),
-    score.technicalScore9, getScoreWord(score.techsuperSc9),
-    score.technicalScore10, getScoreWord(score.techsuperSc10),
-    score.technicalScore11, getScoreWord(score.techsuperSc11),
-    score.technicalScore12, getScoreWord(score.techsuperSc12),
-    score.technicalScore13, getScoreWord(score.techsuperSc13),
-    score.technicalPScore1, getScoreWord(score.techsuperPSc1),
-    score.technicalPScore2, getScoreWord(score.techsuperPSc2),
-    score.technicalPScore3, getScoreWord(score.techsuperPSc3),
-    score.technicalPScore4, getScoreWord(score.techsuperPSc4),
-    score.technicalPScore5, getScoreWord(score.techsuperPSc5),
-    score.technicalPScore6, getScoreWord(score.techsuperPSc6),
-    score.technicalPScore7, getScoreWord(score.techsuperPSc7),
-    score.nonScore1, score.nonScore2, score.nonScore3, score.nonScore4, score.nonScore5, score.nonScore6, score.nonScore7, score.nonScore8, score.ratingValue, obj.positiveComments, obj.negativeComments, obj.redComments
-          ];
+    await fetchAndPushDataToSheets();
+    res.send('Data successfully pushed to Google Sheets!');
+  } catch (error) {
+    console.error('Error pushing data to Google Sheets:', error);
+    res.status(500).send('Error pushing data to Google Sheets');
+  }
 });
 
-transformedData.unshift(headers);
-
-// Pass the transformed data to the export function
-
-const buffer = await exportToExceel(transformedData);
-
-// const buffer = await exportToExceel(wsData);
-
- // Generate a timestamp for the filename
- const now = new Date();
- const timestamp = `all_records_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
 
 
-// Set up response headers
-res.setHeader('Content-Disposition', `attachment; filename="output_${timestamp}.xlsx"`);
-res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
-// Send buffer to client to trigger file download
-res.send(buffer);
-} catch (error) {
-console.error('Error exporting data to Excel:', error);
-res.status(500).send('Error exporting data to Excel');
-}
-});
+
+
+
+// This is to push data to Excel:
+
+// // Pass the transformed data to the export function
+
+// const buffer = await exportToExceel(transformedData);
+
+// // const buffer = await exportToExceel(wsData);
+
+//  // Generate a timestamp for the filename
+//  const now = new Date();
+//  const timestamp = `all_records_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+
+
+// // Set up response headers
+// res.setHeader('Content-Disposition', `attachment; filename="output_${timestamp}.xlsx"`);
+// res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+// // Send buffer to client to trigger file download
+// res.send(buffer);
+// } catch (error) {
+// console.error('Error exporting data to Excel:', error);
+// res.status(500).send('Error exporting data to Excel');
+// }
+// });
 
 
 
@@ -1798,6 +1840,21 @@ app.get('/pdf', async (req, res) => {
 });
 
  
+
+cron.schedule('0 * * * *', async () => {
+  console.log('Running the task every 1 hours');
+  try {
+      await fetchAndPushDataToSheets();
+  } catch (error) {
+      console.error('Error in cron job:', error);
+  }
+});
+
+
+
+
+
+
 
 
 
