@@ -7,7 +7,9 @@ const moment = require('moment');
 // const creds = JSON.parse(fs.readFileSync('./google-credentials.json'));
 
 console.log("GOOGLE_CREDENTIALS value:", process.env.GOOGLE_CREDENTIALS);
-const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+const credsJSON = process.env.GOOGLE_CREDENTIALS || "{}";
+const creds = JSON.parse(credsJSON);
+
 
 // Initialize auth
 const serviceAccountAuth = new JWT({
