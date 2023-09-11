@@ -4,7 +4,7 @@ const { JWT } = require('google-auth-library');
 const moment = require('moment');
 
 // Load credentials from the service account key file
-const creds = JSON.parse(fs.readFileSync('./serviceAccountKey.json'));
+const creds = JSON.parse(fs.readFileSync('./google-credentials.json'));
 
 // Initialize auth
 const serviceAccountAuth = new JWT({
