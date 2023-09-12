@@ -1569,6 +1569,8 @@ for (let key in analyzedScores) {
 
 // *****************************************************************
 
+
+// Route to push to Google SHeets (this is run automatically with node-cron)
 app.get('/download1', async (req, res) => {
   try {
     await fetchAndPushDataToSheets();
@@ -1585,30 +1587,7 @@ app.get('/download1', async (req, res) => {
 
 
 
-// This is to push data to Excel:
 
-// // Pass the transformed data to the export function
-
-// const buffer = await exportToExceel(transformedData);
-
-// // const buffer = await exportToExceel(wsData);
-
-//  // Generate a timestamp for the filename
-//  const now = new Date();
-//  const timestamp = `all_records_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
-
-
-// // Set up response headers
-// res.setHeader('Content-Disposition', `attachment; filename="output_${timestamp}.xlsx"`);
-// res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-// // Send buffer to client to trigger file download
-// res.send(buffer);
-// } catch (error) {
-// console.error('Error exporting data to Excel:', error);
-// res.status(500).send('Error exporting data to Excel');
-// }
-// });
 
 
 
