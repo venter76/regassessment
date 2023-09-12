@@ -1105,7 +1105,7 @@ app.get('/assess', async (req, res) => {
    // Fetch all registrars from the database
    let registrars = [];
    try {
-     registrars = await Registrar.find();
+    registrars = await Registrar.find().sort({ surname: 1 });  // Sorting by surname in ascending order
    } catch (err) {
      console.error("Failed to retrieve registrars:", err);
    }
@@ -1776,16 +1776,25 @@ app.post('/regmanage', async (req, res) => {
 
 
 app.get('/conslist', async (req, res) => {
-  try {
-      // Retrieve all consultants from the database
-      const consultants = await Consultant.find({});
+
+// Fetch all consultants from the database
+let consultants = [];
+try {
+ consultants = await Consultant.find().sort({ surname: 1 });  // Sorting by surname in ascending order
+} catch (err) {
+  console.error("Failed to retrieve consultants:", err);
+}
+
+  // try {
+  //     // Retrieve all consultants from the database
+  //     const consultants = await Consultant.find({});
 
       // Render the conslist.ejs template and pass the consultants data
       res.render('conslist.ejs', { consultants: consultants });
-  } catch (err) {
-      console.error("Error fetching consultants:", err);
-      res.status(500).send("Internal Server Error");
-  }
+  // } catch (err) {
+  //     console.error("Error fetching consultants:", err);
+  //     res.status(500).send("Internal Server Error");
+  // }
 });
 
 
