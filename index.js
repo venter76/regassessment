@@ -1598,7 +1598,7 @@ app.get('/download1', async (req, res) => {
 
 
 
-
+// This route to download Excel data for a particular reg +- time period
 
 app.get('/download2', async (req, res) => {
   try {
@@ -1708,6 +1708,10 @@ app.get('/download2', async (req, res) => {
 
 
 
+
+
+
+
 // Handle the POST request for '/consmanage'
 app.post('/consmanage', async (req, res) => {
   const { firstname, surname, action } = req.body;
@@ -1732,6 +1736,10 @@ app.post('/consmanage', async (req, res) => {
 
   res.redirect('/admin');  // Assuming '/admin' is the route to render admin.ejs
 });
+
+
+
+
 
 
 
@@ -1763,6 +1771,10 @@ app.post('/regmanage', async (req, res) => {
 
 
 
+
+
+
+
 app.get('/conslist', async (req, res) => {
   try {
       // Retrieve all consultants from the database
@@ -1781,16 +1793,24 @@ app.get('/conslist', async (req, res) => {
 
 
 app.get('/reglist', async (req, res) => {
-  try {
-      // Retrieve all consultants from the database
-      const registrars = await Registrar.find({});
 
-      // Render the conslist.ejs template and pass the consultants data
+ // Fetch all registrars from the database
+ let registrars = [];
+ try {
+  registrars = await Registrar.find().sort({ surname: 1 });  // Sorting by surname in ascending order
+ } catch (err) {
+   console.error("Failed to retrieve registrars:", err);
+ }
+
+      // // Retrieve all registrars from the database
+      // const registrars = await Registrar.find({});
+
+      // Render the registrar.ejs template and pass the consultants data
       res.render('reglist.ejs', { registrars: registrars });
-  } catch (err) {
-      console.error("Error fetching registrars:", err);
-      res.status(500).send("Internal Server Error");
-  }
+  // } catch (err) {
+  //     console.error("Error fetching registrars:", err);
+  //     res.status(500).send("Internal Server Error");
+  // }
 });
 
 
