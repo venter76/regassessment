@@ -306,7 +306,7 @@ input[type="range"] {
                 </button>
             </div>
             <div class="modal-body">
-                <button onclick="generatePdf()" class="btn btn-secondary btn-sm custom-width-btn">PDF</button>
+                <!-- <button onclick="generatePdf()" class="btn btn-secondary btn-sm custom-width-btn">PDF</button> -->
                 <a href="#" id="excelDownloadLink" class="btn btn-secondary btn-sm custom-width-btn">Excel</a>
             </div>
             <div class="modal-footer">
@@ -357,12 +357,12 @@ input[type="range"] {
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         function generatePdf() {
           const url = encodeURIComponent(window.location.href);
           window.location.href = `/pdf?url=${url}`;
         }
-      </script>
+      </script> -->
 <script>
           document.addEventListener("DOMContentLoaded", function() {
             const regName = '<%= regName %>';  // Assuming regName is passed to your EJS template
