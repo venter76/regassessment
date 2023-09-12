@@ -35,7 +35,7 @@ const { v4: uuidv4 } = require('uuid');
 
 require('dotenv').config();
 const exportToExceel = require('./exportToExceel');
-const createPdf = require('./createPDF');
+// const createPdf = require('./createPDF');
 const axios = require('axios');
 
  //Nodemailer setup for email verification:
