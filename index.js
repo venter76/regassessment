@@ -1797,27 +1797,27 @@ app.get('/reglist', async (req, res) => {
 
 
 
-app.get('/pdf', async (req, res) => {
-  const { url } = req.query;
+// app.get('/pdf', async (req, res) => {
+//   const { url } = req.query;
 
-  if (!url) {
-    return res.status(400).send('URL is required');
-  }
+//   if (!url) {
+//     return res.status(400).send('URL is required');
+//   }
 
-  try {
-    // Generate PDF using printPDF function
-    const pdf = await createPdf(url);
+//   try {
+//     // Generate PDF using printPDF function
+//     const pdf = await createPdf(url);
 
-    // Set the response headers to specify the PDF content type and disposition.
-    res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
+//     // Set the response headers to specify the PDF content type and disposition.
+//     res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
 
-    // Send the PDF as the response
-    res.send(pdf);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('An error occurred while generating the PDF');
-  }
-});
+//     // Send the PDF as the response
+//     res.send(pdf);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('An error occurred while generating the PDF');
+//   }
+// });
 
  
 
