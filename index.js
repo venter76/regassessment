@@ -655,8 +655,8 @@ app.post("/login", loginLimiter, function(req, res, next) {
 
     if (!user.active) {  // User exists but hasn't verified their email
       console.log("User email not verified");
-      req.flash('error', 'Please verify your email to complete registration. If you cannot find the email link, then register again as a new user.');
-      return res.redirect("/verifytoken");
+      req.flash('error', 'Please verify your email to complete registration. If you cannot find the email, then register again as a new user.');
+      return res.redirect("/verify");
     }
 
     // if (user.verificationToken !== null) {
