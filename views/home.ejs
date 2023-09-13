@@ -139,15 +139,15 @@ input[type="range"] {
 <br>
 
 <div class="jumbotron centered">
-  <% if (success && success.length > 0) { %>
+  <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
     <div class="alert alert-success">
       <%= success[0] %>  <!-- Displaying the first message -->
     </div>
   <% } %>
 
-  <% if (error && error.length > 0) { %>
-    <div class="alert alert-danger error-message" role="alert">
-        <%= error[0] %>
+  <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+    <div class="alert alert-danger">
+        <%= error[0] %>  <!-- Displaying the first error message -->
     </div>
 <% } %>
 
