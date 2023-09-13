@@ -881,7 +881,7 @@ app.get('/verify', async function(req, res) {
 
       try {
           await user.save();
-          console.log('Email verified for user');
+          console.log('Email verified for user2555555555555');
 
           // Add the success message using flash
           req.flash('success', 'Email verified for user');
