@@ -817,7 +817,7 @@ app.post('/register', async function(req, res) {
       try {
           await transporter.sendMail(email);
           console.log('Verification email sent');
-          req.flash('success', 'Verification email has been sent. Copy and paste the code into this box:');
+          req.flash('success', 'Verification email has been sent - check your email inbox');
           res.redirect('/verifytoken');
       } catch (mailError) {
           console.log('Error sending email:', mailError);
