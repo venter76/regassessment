@@ -653,17 +653,17 @@ app.post("/login", loginLimiter, function(req, res, next) {
     }
 
 
-    // if (!user.active) {  // User exists but hasn't verified their email
-    //   console.log("User email not verified");
-    //   req.flash('error', 'Please verify your email to complete registration. If you cannot find the email link, then register again as a new user.');
-    //   return res.redirect("/login");
-    // }
-
-    if (user.verificationToken !== null) {
-      console.log("No user found");
-      req.flash('error', 'Email not verified');
+    if (!user.active) {  // User exists but hasn't verified their email
+      console.log("User email not verified");
+      req.flash('error', 'Please verify your email to complete registration. If you cannot find the email link, then register again as a new user.');
       return res.redirect("/login");
     }
+
+    // if (user.verificationToken !== null) {
+    //   console.log("No user found");
+    //   req.flash('error', 'Email not verified');
+    //   return res.redirect("/login");
+    // }
     
 
     req.login(user, function(err) {
@@ -776,25 +776,25 @@ app.post('/register', async function(req, res) {
         return res.redirect("/register");
     }
 
-    // try {
-    //   const existingUser = await User.findOne({ username: req.body.username });
-    //   if (existingUser) {
-    //       if (!existingUser.active) {
-    //           // The user exists but hasn't been verified yet, remove them and allow re-registration
-    //           await User.deleteOne({ username: req.body.username });
-    //       } else {
-    //           // The user is active and verified, redirect them to login
-    //           req.flash('error', 'User already exists. Please login.');
-    //           return res.redirect('/login');
-    //       }
-    //   }
-
-  try {
+    try {
       const existingUser = await User.findOne({ username: req.body.username });
       if (existingUser) {
-          req.flash('error', 'User already exists. Please login.');
-          return res.redirect('/login');
+          if (!existingUser.active) {
+              // The user exists but hasn't been verified yet, remove them and allow re-registration
+              await User.deleteOne({ username: req.body.username });
+          } else {
+              // The user is active and verified, redirect them to login
+              req.flash('error', 'User already exists. Please login.');
+              return res.redirect('/login');
+          }
       }
+
+  // try {
+  //     const existingUser = await User.findOne({ username: req.body.username });
+  //     if (existingUser) {
+  //         req.flash('error', 'User already exists. Please login.');
+  //         return res.redirect('/login');
+  //     }
 
       const user = await User.register({ username: req.body.username, active: false }, req.body.password);
 
@@ -832,47 +832,8 @@ app.post('/register', async function(req, res) {
 });
 
 
-// app.post('/register', async function(req, res) {
-//   // Check if passwords match
-//   if (req.body.password !== req.body.passwordConfirm) {
-//       console.log('Passwords do not match');
-//       return res.redirect('/register');
-//   } else {
-//       try {
-//           const user = await User.register({ username: req.body.username, active: false }, req.body.password);
 
-//           // Generate a verification token
-//           const verificationToken = uuidv4();
-//           user.verificationToken = verificationToken;
 
-//           await user.save();
-
-//           // Send verification email
-//           const verificationLink = `${process.env.APP_URL}/verify?token=${verificationToken}`;
-//           const email = {
-//               from: 'brayroadapps@gmail.com',
-//               to: user.username,
-//               subject: 'Email Verification',
-//               text: `Please click the following link to verify your email address: ${verificationLink}`,
-//           };
-
-//           try {
-//               await transporter.sendMail(email);
-//               console.log('Verification email sent');
-//               res.redirect('/register?message=verification'); // Redirect with success message
-//           } catch (mailError) {
-//               console.log('Error sending email:', mailError);
-//               res.redirect('/register?error=mail');
-//           }
-//       } catch (err) {
-//           console.log(err);
-//           if (err.name === 'UserExistsError') {
-//               return res.redirect('/register?error=User%20already%20exists.%20Select%20Login.');
-//           }
-//           return res.redirect('/home');
-//       }
-//   }
-// });
 app.post('/verify', async function(req, res) {
   console.log('Verification route entered');
 
