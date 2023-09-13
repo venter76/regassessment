@@ -653,17 +653,17 @@ app.post("/login", loginLimiter, function(req, res, next) {
     }
 
 
-    if (!user.active) {  // User exists but hasn't verified their email
-      console.log("User email not verified");
-      req.flash('error', 'Please verify your email to complete registration. If you cannot find the email link, then register again as a new user.');
-      return res.redirect("/login");
-    }
-
-    // if (user.verificationToken !== null) {
-    //   console.log("No user found");
-    //   req.flash('error', 'Email not verified');
+    // if (!user.active) {  // User exists but hasn't verified their email
+    //   console.log("User email not verified");
+    //   req.flash('error', 'Please verify your email to complete registration. If you cannot find the email link, then register again as a new user.');
     //   return res.redirect("/login");
     // }
+
+    if (user.verificationToken !== null) {
+      console.log("No user found");
+      req.flash('error', 'Email not verified');
+      return res.redirect("/login");
+    }
     
 
     req.login(user, function(err) {
@@ -762,25 +762,25 @@ app.post('/register', async function(req, res) {
         return res.redirect("/register");
     }
 
-    try {
+    // try {
+    //   const existingUser = await User.findOne({ username: req.body.username });
+    //   if (existingUser) {
+    //       if (!existingUser.active) {
+    //           // The user exists but hasn't been verified yet, remove them and allow re-registration
+    //           await User.deleteOne({ username: req.body.username });
+    //       } else {
+    //           // The user is active and verified, redirect them to login
+    //           req.flash('error', 'User already exists. Please login.');
+    //           return res.redirect('/login');
+    //       }
+    //   }
+
+  try {
       const existingUser = await User.findOne({ username: req.body.username });
       if (existingUser) {
-          if (!existingUser.active) {
-              // The user exists but hasn't been verified yet, remove them and allow re-registration
-              await User.deleteOne({ username: req.body.username });
-          } else {
-              // The user is active and verified, redirect them to login
-              req.flash('error', 'User already exists. Please login.');
-              return res.redirect('/login');
-          }
+          req.flash('error', 'User already exists. Please login.');
+          return res.redirect('/login');
       }
-
-  // try {
-  //     const existingUser = await User.findOne({ username: req.body.username });
-  //     if (existingUser) {
-  //         req.flash('error', 'User already exists. Please login.');
-  //         return res.redirect('/login');
-  //     }
 
       const user = await User.register({ username: req.body.username, active: false }, req.body.password);
 
