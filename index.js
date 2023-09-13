@@ -796,7 +796,8 @@ app.post('/register', async function(req, res) {
           from: 'brayroadapps@gmail.com',
           to: user.username,
           subject: 'Email Verification',
-          text: `Please click the following link to verify your email address: ${verificationLink}`,
+          text: `Please click the following link to verify your email address: ${verificationToken}`,
+          // text: `Please click the following link to verify your email address: ${verificationLink}`,
       };
 
       try {
