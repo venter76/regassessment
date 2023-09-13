@@ -689,6 +689,20 @@ app.post("/login", loginLimiter, function(req, res, next) {
 
 
 
+app.get('/verifytoken', (req, res) => {
+  res.render('login', { 
+    success: req.flash('success'),
+    error: req.flash('error') 
+  });
+});
+
+
+
+
+
+
+
+
 app.get("/welcome", function(req, res){
   res.render("welcome");
 });
@@ -796,7 +810,7 @@ app.post('/register', async function(req, res) {
           from: 'brayroadapps@gmail.com',
           to: user.username,
           subject: 'Email Verification',
-          text: `Please click the following link to verify your email address: https://regassess-41b7ca254988.herokuapp.com/verify?token=${verificationToken}`,
+          text: `Please click the following link to verify your email address: ${verificationToken}`,
           // text: `Please click the following link to verify your email address: ${verificationLink}`,
       };
 
@@ -804,7 +818,7 @@ app.post('/register', async function(req, res) {
           await transporter.sendMail(email);
           console.log('Verification email sent');
           req.flash('success', 'Verification email has been sent.');
-          res.redirect('/register');
+          res.redirect('/verifytoken');
       } catch (mailError) {
           console.log('Error sending email:', mailError);
           req.flash('error', 'Failed to send verification email.');
@@ -859,16 +873,26 @@ app.post('/register', async function(req, res) {
 //       }
 //   }
 // });
+app.post('/verify', async function(req, res) {
+  console.log('Verification route entered');
 
-
-
-app.get('/verify', async function(req, res) {
-  console.log('Vefification route entered');
-  const verificationToken = req.query.token;
+  // Get the verification token from the form data
+  const verificationToken = req.body.verificationToken;
 
   try {
       // Find the user with the matching verification token
       const user = await User.findOne({ verificationToken: verificationToken });
+
+// Below is origional link code for clickable link from email:
+
+
+// app.get('/verify', async function(req, res) {
+//   console.log('Vefification route entered');
+//   const verificationToken = req.query.token;
+
+//   try {
+//       // Find the user with the matching verification token
+//       const user = await User.findOne({ verificationToken: verificationToken });
 
       if (!user) {
           // Invalid or expired token
