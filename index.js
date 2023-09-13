@@ -810,7 +810,7 @@ app.post('/register', async function(req, res) {
           from: 'brayroadapps@gmail.com',
           to: user.username,
           subject: 'Email Verification',
-          text: `Please click the following link to verify your email address: ${verificationToken}`,
+          text: `Please copy and paste this code into text box:    ${verificationToken}`,
           // text: `Please click the following link to verify your email address: ${verificationLink}`,
       };
 
@@ -871,7 +871,7 @@ app.post('/verify', async function(req, res) {
           console.log('Email verified for user2555555555555');
 
           // Add the success message using flash
-          req.flash('success', 'Email verified for user');
+          req.flash('success', 'Email verified for user. Please login.');
           console.log('Redirecting to login page');
           res.redirect('/login');
       } catch (saveErr) {
