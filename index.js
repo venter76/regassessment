@@ -690,7 +690,7 @@ app.post("/login", loginLimiter, function(req, res, next) {
 
 
 app.get('/verifytoken', (req, res) => {
-  res.render('login', { 
+  res.render('verifytoken', { 
     success: req.flash('success'),
     error: req.flash('error') 
   });
