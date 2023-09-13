@@ -862,6 +862,7 @@ app.post('/register', async function(req, res) {
 
 
 app.get('/verify', async function(req, res) {
+  console.log('Vefification route entered');
   const verificationToken = req.query.token;
 
   try {
@@ -885,7 +886,7 @@ app.get('/verify', async function(req, res) {
 
           // Add the success message using flash
           req.flash('success', 'Email verified for user');
-          
+          console.log('Redirecting to login page');
           res.redirect('/login');
       } catch (saveErr) {
           console.log('Error saving user:', saveErr);
