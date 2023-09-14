@@ -6,7 +6,7 @@ const moment = require('moment');
 // Load credentials from the service account key file
 // const creds = JSON.parse(fs.readFileSync('./google-credentials.json'));
 
-console.log("GOOGLE_CREDENTIALS value:", process.env.GOOGLE_CREDENTIALS);
+// console.log("GOOGLE_CREDENTIALS value:", process.env.GOOGLE_CREDENTIALS);
 const credsJSON = process.env.GOOGLE_CREDENTIALS || "{}";
 const creds = JSON.parse(credsJSON);
 
